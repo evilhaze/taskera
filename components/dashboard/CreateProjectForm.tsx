@@ -41,7 +41,7 @@ export function CreateProjectForm() {
         <div className="space-y-2">
           <label
             htmlFor="project-name"
-            className="block text-sm font-medium text-zinc-400"
+            className="block text-sm font-medium text-[var(--asana-text-secondary)]"
           >
             Название
           </label>
@@ -58,7 +58,7 @@ export function CreateProjectForm() {
         <div className="space-y-2">
           <label
             htmlFor="project-desc"
-            className="block text-sm font-medium text-zinc-400"
+            className="block text-sm font-medium text-[var(--asana-text-secondary)]"
           >
             Описание (необязательно)
           </label>
@@ -72,8 +72,8 @@ export function CreateProjectForm() {
           />
         </div>
         {error && (
-          <div className="rounded-lg border border-red-900/60 bg-red-950/40 px-3 py-2.5">
-            <p className="text-sm text-red-300">{error}</p>
+          <div className="rounded-md border border-[var(--asana-red)]/50 bg-[var(--asana-red)]/10 px-3 py-2.5">
+            <p className="text-sm text-[var(--asana-red)]">{error}</p>
           </div>
         )}
         <button type="submit" disabled={loading} className="btn-primary">

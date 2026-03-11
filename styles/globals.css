@@ -2,17 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Asana Dark Theme Design System — design tokens */
 @layer base {
   :root {
-    --app-bg: #0a0a0b;
-    --app-surface: rgba(24, 24, 27, 0.8);
-    --app-surface-hover: rgba(39, 39, 42, 0.9);
-    --app-border: rgba(63, 63, 70, 0.8);
-    --app-border-muted: rgba(39, 39, 42, 0.9);
-    --accent: #7c3aed;
-    --accent-hover: #8b5cf6;
-    --accent-muted: rgba(124, 58, 237, 0.15);
-    --accent-ring: rgba(124, 58, 237, 0.4);
+    /* Backgrounds (darkest to lightest) */
+    --asana-bg-app: #1E1E2A;
+    --asana-bg-sidebar: #1A1A24;
+    --asana-bg-content: #252530;
+    --asana-bg-input: #2A2A38;
+    --asana-bg-card: #2E2E3E;
+    --asana-bg-card-hover: #333345;
+    --asana-bg-input-focus: #2E2E3E;
+    /* Text */
+    --asana-text-primary: #E8E8F0;
+    --asana-text-secondary: #9090A8;
+    --asana-text-placeholder: #606078;
+    --asana-text-disabled: #454560;
+    /* Borders */
+    --asana-border: #3A3A50;
+    --asana-border-subtle: #2E2E42;
+    --asana-border-focus: #4986FF;
+    /* Brand */
+    --asana-blue: #4986FF;
+    --asana-blue-dark: #3070EE;
+    --asana-coral: #F06A6A;
+    --asana-coral-dark: #E05555;
+    --asana-green: #4EC9A0;
+    --asana-red: #F06A6A;
+    /* Legacy app vars for compatibility */
+    --app-bg: var(--asana-bg-app);
+    --app-surface: var(--asana-bg-card);
+    --app-surface-hover: var(--asana-bg-card-hover);
+    --app-border: var(--asana-border);
+    --app-border-muted: var(--asana-border-subtle);
+    --accent: var(--asana-blue);
+    --accent-hover: var(--asana-blue-dark);
+    --accent-muted: rgba(73, 134, 255, 0.15);
+    --accent-ring: rgba(73, 134, 255, 0.4);
   }
 
   html {
@@ -26,41 +52,124 @@
   }
 
   body {
-    @apply bg-[var(--app-bg)] text-zinc-100;
+    background: var(--asana-bg-app);
+    color: var(--asana-text-primary);
   }
 }
 
 @layer components {
   .input-base {
-    @apply w-full rounded-lg border border-zinc-700 bg-zinc-900/90 px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 transition-colors duration-200;
-    @apply outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20;
+    background: var(--asana-bg-input);
+    border: 1px solid var(--asana-border);
+    border-radius: 6px;
+    padding: 7px 12px;
+    font-size: 14px;
+    color: var(--asana-text-primary);
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .input-base::placeholder {
+    color: var(--asana-text-placeholder);
+  }
+  .input-base:hover {
+    border-color: var(--asana-text-placeholder);
+  }
+  .input-base:focus {
+    outline: none;
+    border-color: var(--asana-border-focus);
+    box-shadow: 0 0 0 3px rgba(73, 134, 255, 0.15);
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg bg-violet-600 px-4 py-2.5 text-sm font-medium text-white transition-colors duration-200;
-    @apply hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/40 focus:ring-offset-2 focus:ring-offset-[var(--app-bg)];
-    @apply disabled:pointer-events-none disabled:opacity-50;
+    background: var(--asana-blue);
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 7px 16px;
+    border-radius: 6px;
+    border: none;
+    box-shadow: 0 1px 4px rgba(73, 134, 255, 0.3);
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+  .btn-primary:hover {
+    background: var(--asana-blue-dark);
+    box-shadow: 0 2px 8px rgba(73, 134, 255, 0.4);
+  }
+  .btn-primary:focus {
+    outline: 2px solid rgba(73, 134, 255, 0.5);
+    outline-offset: 2px;
+  }
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #2A3A60;
+  }
+
+  .btn-create {
+    background: var(--asana-coral);
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: none;
+    transition: background 0.2s;
+  }
+  .btn-create:hover {
+    background: var(--asana-coral-dark);
+  }
+  .btn-create:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800/80 px-4 py-2.5 text-sm font-medium text-zinc-200 transition-colors duration-200;
-    @apply hover:border-zinc-600 hover:bg-zinc-700/80 focus:outline-none focus:ring-2 focus:ring-zinc-500/30 focus:ring-offset-2 focus:ring-offset-[var(--app-bg)];
-    @apply disabled:pointer-events-none disabled:opacity-50;
+    background: transparent;
+    border: 1px solid var(--asana-border);
+    color: var(--asana-text-secondary);
+    font-size: 13px;
+    font-weight: 400;
+    padding: 5px 12px;
+    border-radius: 6px;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+  }
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--asana-text-placeholder);
+    color: var(--asana-text-primary);
+  }
+  .btn-secondary:focus {
+    outline: 2px solid rgba(73, 134, 255, 0.3);
+    outline-offset: 2px;
+  }
+  .btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   .card {
-    @apply rounded-card border border-zinc-800/90 bg-zinc-900/60 shadow-card transition-shadow duration-200;
+    background: var(--asana-bg-card);
+    border: 1px solid var(--asana-border);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+    transition: box-shadow 0.2s, background 0.2s, border-color 0.2s;
   }
 
-  .card-hover {
-    @apply hover:border-zinc-700/90 hover:shadow-cardHover;
+  .card-hover:hover {
+    background: var(--asana-bg-card-hover);
+    border-color: #4A4A62;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   }
 
   .section-title {
-    @apply text-lg font-medium tracking-tight text-zinc-200;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--asana-text-primary);
   }
 
   .page-title {
-    @apply text-2xl font-semibold tracking-tight text-zinc-50;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--asana-text-primary);
   }
 }

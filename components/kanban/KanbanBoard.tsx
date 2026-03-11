@@ -67,33 +67,31 @@ function TaskCard({
   return (
     <div
       className={
-        "rounded-lg border bg-zinc-900/95 p-3.5 shadow-card transition-colors " +
+        "rounded-lg border bg-[var(--asana-bg-card)] p-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.3)] transition-colors " +
         (isOverlay
-          ? "border-violet-500/80 ring-2 ring-violet-500/30 cursor-grabbing"
-          : "border-zinc-700/80 hover:border-zinc-600")
+          ? "border-[var(--asana-blue)]/60 shadow-[0_8px_24px_rgba(0,0,0,0.5)] cursor-grabbing opacity-95"
+          : "border-[var(--asana-border)] hover:bg-[var(--asana-bg-card-hover)] hover:border-[#4A4A62] hover:shadow-[0_4px_12px_rgba(0,0,0,0.4)]")
       }
     >
-      <p className="font-medium text-zinc-100">{task.title}</p>
+      <p className="text-sm font-medium text-[var(--asana-text-primary)]">{task.title}</p>
       {task.description && (
-        <p className="mt-1 line-clamp-2 text-xs text-zinc-500">
+        <p className="mt-1 line-clamp-2 text-xs text-[var(--asana-text-secondary)]">
           {task.description}
         </p>
       )}
-      <div className="mt-2.5 flex flex-wrap gap-2 text-xs text-zinc-500">
+      <div className="mt-2.5 flex flex-wrap gap-2 text-xs text-[var(--asana-text-secondary)]">
         {task.assignee && (
-          <span title={task.assignee.email} className="truncate max-w-[120px]">
+          <span title={task.assignee.email} className="max-w-[120px] truncate">
             {task.assignee.email}
           </span>
         )}
-        {deadlineStr && (
-          <span className="text-zinc-600">{deadlineStr}</span>
-        )}
+        {deadlineStr && <span>{deadlineStr}</span>}
         <span
           className={
             task.priority === "HIGH"
-              ? "font-medium text-amber-400/90"
+              ? "font-medium text-[#FF7070]"
               : task.priority === "LOW"
-                ? "text-zinc-600"
+                ? "text-[var(--asana-text-placeholder)]"
                 : ""
           }
         >
@@ -150,7 +148,7 @@ function DraggableCard({
             onDelete(task.id);
           }}
           disabled={deletingId !== null}
-          className="absolute top-2 right-2 rounded-lg bg-zinc-800/95 px-2 py-1 text-xs font-medium text-red-400/90 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-950/60 hover:text-red-300 disabled:opacity-50"
+          className="absolute top-2 right-2 rounded-md bg-[var(--asana-bg-card-hover)] px-2 py-1 text-xs font-medium text-[var(--asana-red)] opacity-0 transition-opacity group-hover:opacity-100 hover:bg-[var(--asana-red)]/10 disabled:opacity-50"
         >
           {deletingId === task.id ? "…" : "Удалить"}
         </button>
@@ -178,16 +176,17 @@ function DroppableColumn({
     <div
       ref={setNodeRef}
       className={
-        "min-h-[220px] flex-1 min-w-[260px] rounded-card border-2 border-dashed p-4 transition-colors duration-200 " +
-        (isOver
-          ? "border-violet-500/50 bg-violet-950/20"
-          : "border-zinc-800 bg-zinc-900/30")
+        "min-h-[220px] flex-1 min-w-[280px] rounded-none border-0 bg-[var(--asana-bg-content)] px-2 py-4 transition-colors " +
+        (isOver ? "ring-2 ring-inset ring-[var(--asana-blue)]/50" : "")
       }
     >
-      <h3 className="mb-3 text-sm font-medium text-zinc-500">
-        {label} ({tasks.length})
+      <h3 className="mb-3 text-sm font-semibold text-[var(--asana-text-primary)]">
+        {label}{" "}
+        <span className="font-normal text-[var(--asana-text-secondary)]">
+          ({tasks.length})
+        </span>
       </h3>
-      <div className="space-y-2.5">
+      <div className="space-y-2">
         {tasks.map((task) => (
           <DraggableCard
             key={task.id}
@@ -258,7 +257,7 @@ export function KanbanBoard({
 
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="flex flex-wrap gap-5">
+      <div className="flex flex-wrap gap-4">
         {STATUS_ORDER.map((status) => (
           <DroppableColumn
             key={status}

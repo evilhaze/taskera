@@ -52,10 +52,10 @@ export function CreateTaskForm({ projectId, members }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="card p-5">
-      <h3 className="text-base font-medium text-zinc-200 mb-4">Новая задача</h3>
+      <h3 className="text-base font-medium text-[var(--asana-text-primary)] mb-4">Новая задача</h3>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2 space-y-2">
-          <label className="block text-sm font-medium text-zinc-400">
+          <label className="block text-sm font-medium text-[var(--asana-text-secondary)]">
             Название *
           </label>
           <input
@@ -68,7 +68,7 @@ export function CreateTaskForm({ projectId, members }: Props) {
           />
         </div>
         <div className="sm:col-span-2 space-y-2">
-          <label className="block text-sm font-medium text-zinc-400">
+          <label className="block text-sm font-medium text-[var(--asana-text-secondary)]">
             Описание
           </label>
           <textarea
@@ -80,7 +80,7 @@ export function CreateTaskForm({ projectId, members }: Props) {
           />
         </div>
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-zinc-400">
+          <label className="block text-sm font-medium text-[var(--asana-text-secondary)]">
             Исполнитель
           </label>
           <select name="assigneeId" className="input-base">
@@ -94,17 +94,13 @@ export function CreateTaskForm({ projectId, members }: Props) {
           </select>
         </div>
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-zinc-400">
+          <label className="block text-sm font-medium text-[var(--asana-text-secondary)]">
             Дедлайн
           </label>
-          <input
-            name="deadline"
-            type="datetime-local"
-            className="input-base"
-          />
+          <input name="deadline" type="datetime-local" className="input-base" />
         </div>
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-zinc-400">
+          <label className="block text-sm font-medium text-[var(--asana-text-secondary)]">
             Приоритет
           </label>
           <select name="priority" className="input-base">
@@ -115,15 +111,11 @@ export function CreateTaskForm({ projectId, members }: Props) {
         </div>
       </div>
       {error && (
-        <div className="mt-4 rounded-lg border border-red-900/60 bg-red-950/40 px-3 py-2.5">
-          <p className="text-sm text-red-300">{error}</p>
+        <div className="mt-4 rounded-md border border-[var(--asana-red)]/50 bg-[var(--asana-red)]/10 px-3 py-2.5">
+          <p className="text-sm text-[var(--asana-red)]">{error}</p>
         </div>
       )}
-      <button
-        type="submit"
-        disabled={loading}
-        className="btn-primary mt-4"
-      >
+      <button type="submit" disabled={loading} className="btn-primary mt-4">
         {loading ? "Создание…" : "Создать задачу"}
       </button>
     </form>

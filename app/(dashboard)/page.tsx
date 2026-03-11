@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ProjectList } from "@/components/dashboard/ProjectList";
@@ -49,21 +48,13 @@ export default async function DashboardPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[var(--app-bg)]">
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-        <header className="mb-10 flex flex-wrap items-start justify-between gap-6">
-          <div>
-            <h1 className="page-title text-zinc-50">Дашборд</h1>
-            <p className="mt-1 text-sm text-zinc-500">
-              Вы вошли как{" "}
-              <span className="font-medium text-zinc-400">{user.email}</span>
-            </p>
-          </div>
-          <form action="/api/auth/logout" method="POST">
-            <button type="submit" className="btn-secondary">
-              Выйти
-            </button>
-          </form>
+    <div className="mx-auto max-w-4xl">
+        <header className="mb-8">
+          <h1 className="page-title text-[var(--asana-text-primary)]">Дашборд</h1>
+          <p className="mt-1 text-sm text-[var(--asana-text-secondary)]">
+            Вы вошли как{" "}
+            <span className="font-medium text-[var(--asana-text-primary)]">{user.email}</span>
+          </p>
         </header>
 
         <div className="space-y-10">
@@ -71,7 +62,6 @@ export default async function DashboardPage() {
           <CreateProjectForm />
           <ProjectList />
         </div>
-      </div>
     </div>
   );
 }

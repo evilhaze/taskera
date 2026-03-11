@@ -10,34 +10,39 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        app: {
-          bg: "var(--app-bg)",
-          surface: "var(--app-surface)",
-          surfaceHover: "var(--app-surface-hover)",
-          border: "var(--app-border)",
-          borderMuted: "var(--app-border-muted)"
-        },
-        accent: {
-          DEFAULT: "var(--accent)",
-          hover: "var(--accent-hover)",
-          muted: "var(--accent-muted)",
-          ring: "var(--accent-ring)"
+        asana: {
+          "bg-app": "#1E1E2A",
+          "bg-sidebar": "#1A1A24",
+          "bg-content": "#252530",
+          "bg-card": "#2E2E3E",
+          "bg-card-hover": "#333345",
+          "text-primary": "#E8E8F0",
+          "text-secondary": "#9090A8",
+          "text-placeholder": "#606078",
+          "border": "#3A3A50",
+          "border-subtle": "#2E2E42",
+          blue: "#4986FF",
+          "blue-dark": "#3070EE",
+          coral: "#F06A6A",
+          "coral-dark": "#E05555",
+          green: "#4EC9A0",
+          red: "#F06A6A"
         }
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "system-ui", "sans-serif"]
+        sans: ["var(--font-sans)", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"]
       },
       borderRadius: {
-        card: "0.75rem",
-        panel: "0.5rem"
+        card: "8px",
+        panel: "6px"
       },
       boxShadow: {
-        card: "0 1px 3px 0 rgb(0 0 0 / 0.15), 0 1px 2px -1px rgb(0 0 0 / 0.15)",
-        cardHover:
-          "0 4px 6px -1px rgb(0 0 0 / 0.12), 0 2px 4px -2px rgb(0 0 0 / 0.1)"
+        card: "0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)",
+        cardHover: "0 4px 12px rgba(0,0,0,0.4)",
+        buttonPrimary: "0 1px 4px rgba(73,134,255,0.3)"
       },
-      transitionDuration: {
-        200: "200ms"
+      spacing: {
+        "sidebar": "240px"
       }
     }
   },

@@ -64,50 +64,48 @@ export default async function ProjectPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--app-bg)]">
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        <header className="mb-10">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-300 transition-colors mb-4"
-          >
-            <span aria-hidden>←</span>
-            Назад к дашборду
-          </Link>
-          <h1 className="page-title text-zinc-50">{project.name}</h1>
-          {project.description && (
-            <p className="mt-1.5 text-zinc-500">{project.description}</p>
-          )}
-          <p className="mt-2 text-xs text-zinc-600">
-            Владелец: {project.owner.email}
-            {isOwner && " (вы)"}
-          </p>
-        </header>
+    <div className="mx-auto max-w-6xl">
+      <header className="mb-8">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm text-[var(--asana-text-secondary)] hover:text-[var(--asana-text-primary)] transition-colors mb-4"
+        >
+          <span aria-hidden>←</span>
+          Назад к дашборду
+        </Link>
+        <h1 className="page-title text-[var(--asana-text-primary)]">{project.name}</h1>
+        {project.description && (
+          <p className="mt-1.5 text-[var(--asana-text-secondary)]">{project.description}</p>
+        )}
+        <p className="mt-2 text-xs text-[var(--asana-text-placeholder)]">
+          Владелец: {project.owner.email}
+          {isOwner && " (вы)"}
+        </p>
+      </header>
 
-        <div className="space-y-10">
-          <MembersSection
-            projectId={project.id}
-            members={project.members}
-            ownerId={project.ownerId}
-            currentUserId={user.id}
-            isOwner={isOwner}
-          />
+      <div className="space-y-10">
+        <MembersSection
+          projectId={project.id}
+          members={project.members}
+          ownerId={project.ownerId}
+          currentUserId={user.id}
+          isOwner={isOwner}
+        />
 
-          <AnalyticsSection
-            total={total}
-            byStatus={byStatus}
-            overdue={overdue}
-          />
+        <AnalyticsSection
+          total={total}
+          byStatus={byStatus}
+          overdue={overdue}
+        />
 
-          <TasksSection
-            projectId={project.id}
-            members={project.members.map((m) => ({
-              id: m.user.id,
-              email: m.user.email,
-              name: m.user.name
-            }))}
-          />
-        </div>
+        <TasksSection
+          projectId={project.id}
+          members={project.members.map((m) => ({
+            id: m.user.id,
+            email: m.user.email,
+            name: m.user.name
+          }))}
+        />
       </div>
     </div>
   );

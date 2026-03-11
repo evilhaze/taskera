@@ -74,15 +74,15 @@ export function TasksSection({ projectId, members }: Props) {
 
       {loading ? (
         <div className="card flex items-center justify-center py-16">
-          <div className="flex items-center gap-2 text-sm text-zinc-500">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-600 border-t-violet-500" />
+          <div className="flex items-center gap-2 text-sm text-[var(--asana-text-secondary)]">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--asana-border)] border-t-[var(--asana-blue)]" />
             Загрузка задач…
           </div>
         </div>
       ) : tasks.length === 0 ? (
         <div className="card flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-zinc-500">Задач пока нет.</p>
-          <p className="mt-1 text-sm text-zinc-600">
+          <p className="text-[var(--asana-text-secondary)]">Задач пока нет.</p>
+          <p className="mt-1 text-sm text-[var(--asana-text-placeholder)]">
             Создайте первую задачу выше.
           </p>
         </div>

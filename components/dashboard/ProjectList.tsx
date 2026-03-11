@@ -30,8 +30,8 @@ export function ProjectList() {
       <section>
         <h2 className="section-title mb-4">Мои проекты</h2>
         <div className="card flex items-center justify-center py-12">
-          <div className="flex items-center gap-2 text-sm text-zinc-500">
-            <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-600 border-t-violet-500" />
+          <div className="flex items-center gap-2 text-sm text-[var(--asana-text-secondary)]">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--asana-border)] border-t-[var(--asana-blue)]" />
             Загрузка…
           </div>
         </div>
@@ -44,8 +44,8 @@ export function ProjectList() {
       <section>
         <h2 className="section-title mb-4">Мои проекты</h2>
         <div className="card flex flex-col items-center justify-center py-14 text-center">
-          <p className="text-zinc-500">Проектов пока нет.</p>
-          <p className="mt-1 text-sm text-zinc-600">
+          <p className="text-[var(--asana-text-secondary)]">Проектов пока нет.</p>
+          <p className="mt-1 text-sm text-[var(--asana-text-placeholder)]">
             Создайте первый проект с помощью формы выше.
           </p>
         </div>
@@ -63,18 +63,18 @@ export function ProjectList() {
               href={`/projects/${p.id}`}
               className="card card-hover block p-5"
             >
-              <span className="font-medium text-zinc-100">{p.name}</span>
+              <span className="font-medium text-[var(--asana-text-primary)]">{p.name}</span>
               {p.description && (
-                <p className="mt-1.5 line-clamp-2 text-sm text-zinc-500">
+                <p className="mt-1.5 line-clamp-2 text-sm text-[var(--asana-text-secondary)]">
                   {p.description}
                 </p>
               )}
-              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[var(--asana-text-secondary)]">
                 <span>{p._count.members} участников</span>
                 <span>·</span>
                 <span>{p._count.tasks} задач</span>
                 {p.myRole === "OWNER" && (
-                  <span className="ml-1 rounded-md bg-zinc-700/80 px-2 py-0.5 font-medium text-zinc-300">
+                  <span className="ml-1 rounded bg-[var(--asana-bg-card-hover)] px-2 py-0.5 font-medium text-[var(--asana-text-primary)]">
                     Владелец
                   </span>
                 )}

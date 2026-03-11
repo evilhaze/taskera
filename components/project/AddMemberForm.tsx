@@ -42,7 +42,7 @@ export function AddMemberForm({ projectId, onSuccess }: Props) {
       <div className="min-w-[200px] flex-1 space-y-1.5">
         <label
           htmlFor="member-email"
-          className="block text-sm font-medium text-zinc-400"
+          className="block text-sm font-medium text-[var(--asana-text-secondary)]"
         >
           Добавить по email
         </label>
@@ -59,10 +59,10 @@ export function AddMemberForm({ projectId, onSuccess }: Props) {
         {loading ? "Добавление…" : "Добавить"}
       </button>
       {error && (
-        <p className="w-full text-sm text-red-400">{error}</p>
+        <p className="w-full text-sm text-[var(--asana-red)]">{error}</p>
       )}
       {success && (
-        <p className="w-full text-sm text-emerald-400">{success}</p>
+        <p className="w-full text-sm text-[var(--asana-green)]">{success}</p>
       )}
     </form>
   );
