@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Users } from "lucide-react";
+import { CalendarDays, Users, Activity } from "lucide-react";
 
 type Project = {
   id: string;
@@ -36,6 +36,7 @@ export function AppSidebar() {
   const isToday = pathname === "/today";
   const isNotifications = pathname === "/notifications";
   const isTeam = pathname === "/team";
+  const isActivity = pathname === "/activity";
   const projectId = pathname.startsWith("/projects/") ? pathname.split("/")[2] : null;
 
   return (
@@ -102,6 +103,18 @@ export function AppSidebar() {
         >
           <Users className="h-4 w-4 shrink-0 text-[var(--asana-text-secondary)]" aria-hidden />
           Команда
+        </Link>
+
+        <Link
+          href="/activity"
+          className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors ${
+            isActivity
+              ? "bg-white/10 text-[var(--asana-text-primary)]"
+              : "text-[var(--asana-text-secondary)] hover:bg-white/5 hover:text-[var(--asana-text-primary)]"
+          }`}
+        >
+          <Activity className="h-4 w-4 shrink-0 text-[var(--asana-text-secondary)]" aria-hidden />
+          Активность
         </Link>
 
         <div className="mt-3 px-2.5 pb-1 pt-2">
