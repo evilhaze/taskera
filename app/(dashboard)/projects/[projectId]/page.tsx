@@ -19,10 +19,10 @@ export default async function ProjectPage({ params }: Props) {
     include: {
       project: {
         include: {
-          owner: { select: { id, email, name } },
+          owner: { select: { id: true, email: true, name: true } },
           members: {
             include: {
-              user: { select: { id, email, name } }
+              user: { select: { id: true, email: true, name: true } }
             }
           }
         }

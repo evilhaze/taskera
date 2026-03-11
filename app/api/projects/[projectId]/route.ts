@@ -20,10 +20,10 @@ export async function GET(
     include: {
       project: {
         include: {
-          owner: { select: { id, email, name } },
+          owner: { select: { id: true, email: true, name: true } },
           members: {
             include: {
-              user: { select: { id, email, name } }
+              user: { select: { id: true, email: true, name: true } }
             }
           },
           _count: { select: { tasks: true } }

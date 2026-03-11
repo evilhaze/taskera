@@ -14,7 +14,7 @@ export async function GET() {
     include: {
       project: {
         include: {
-          owner: { select: { id, email, name } },
+          owner: { select: { id: true, email: true, name: true } },
           _count: { select: { members: true, tasks: true } }
         }
       }
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
   const created = await prisma.project.findUnique({
     where: { id: project.id },
     include: {
-      owner: { select: { id, email, name } },
+      owner: { select: { id: true, email: true, name: true } },
       _count: { select: { members: true, tasks: true } }
     }
   });
