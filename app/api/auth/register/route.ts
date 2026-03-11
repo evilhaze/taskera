@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    setAuthCookie(user.id);
+    await setAuthCookie(user.id);
 
     return NextResponse.json(
       {

@@ -28,7 +28,7 @@ export function verifyAuthToken(token: string): { userId: string } | null {
 }
 
 export async function getCurrentUser() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get(TOKEN_COOKIE_NAME)?.value;
   if (!token) return null;
 
@@ -40,9 +40,9 @@ export async function getCurrentUser() {
   });
 }
 
-export function setAuthCookie(userId: string) {
+export async function setAuthCookie(userId: string) {
   const token = signAuthToken({ userId });
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   cookieStore.set(TOKEN_COOKIE_NAME, token, {
     httpOnly: true,
     sameSite: "lax",
@@ -51,7 +51,7 @@ export function setAuthCookie(userId: string) {
   });
 }
 
-export function clearAuthCookie() {
-  const cookieStore = cookies();
+export async function clearAuthCookie() {
+  const cookieStore = await cookies();
   cookieStore.delete(TOKEN_COOKIE_NAME);
 }
