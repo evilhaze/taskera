@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 type Project = {
   id: string;
   name: string;
+  progressPercent?: number;
 };
 
 export function AppSidebar() {
@@ -15,8 +16,18 @@ export function AppSidebar() {
 
   useEffect(() => {
     fetch("/api/projects")
-      .then((res) => res.ok ? res.json() : [])
-      .then((data) => setProjects(Array.isArray(data) ? data.map((p: { id: string; name: string }) => ({ id: p.id, name: p.name })) : []));
+      .then((res) => (res.ok ? res.json() : []))
+      .then((data) =>
+        setProjects(
+          Array.isArray(data)
+            ? data.map((p: { id: string; name: string; progressPercent?: number }) => ({
+                id: p.id,
+                name: p.name,
+                progressPercent: p.progressPercent ?? 0
+              }))
+            : []
+        )
+      );
   }, []);
 
   const isHome = pathname === "/";
@@ -101,17 +112,28 @@ export function AppSidebar() {
                 <li key={p.id}>
                   <Link
                     href={`/projects/${p.id}`}
-                    className={`flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm transition-colors ${
+                    className={`flex flex-col gap-1 rounded-md px-2.5 py-1.5 text-sm transition-colors ${
                       isActive
                         ? "bg-white/10 font-medium text-[var(--asana-text-primary)]"
                         : "text-[var(--asana-text-secondary)] hover:bg-white/5 hover:text-[var(--asana-text-primary)]"
                     }`}
                   >
-                    <span
-                      className="h-2 w-2 shrink-0 rounded-full bg-[var(--asana-green)]"
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="h-2 w-2 shrink-0 rounded-full bg-[var(--asana-green)]"
+                        aria-hidden
+                      />
+                      <span className="truncate">{p.name}</span>
+                    </div>
+                    <div
+                      className="h-0.5 w-full overflow-hidden rounded-full bg-[var(--asana-bg-input)]"
                       aria-hidden
-                    />
-                    <span className="truncate">{p.name}</span>
+                    >
+                      <div
+                        className="h-full rounded-full bg-[var(--progress-fill)] transition-[width] duration-500 ease-out"
+                        style={{ width: `${Math.min(100, Math.max(0, p.progressPercent ?? 0))}%` }}
+                      />
+                    </div>
                   </Link>
                 </li>
               );

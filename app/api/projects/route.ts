@@ -21,10 +21,45 @@ export async function GET() {
     }
   });
 
-  const projects = memberships.map((m) => ({
-    ...m.project,
-    myRole: m.role
-  }));
+  const projectIds = memberships.map((m) => m.project.id);
+  const [doneGroups, overdueGroups] =
+    projectIds.length === 0
+      ? [[], []]
+      : await Promise.all([
+          prisma.task.groupBy({
+            by: ["projectId"],
+            where: { projectId: { in: projectIds }, status: "DONE" },
+            _count: { _all: true }
+          }),
+          prisma.task.groupBy({
+            by: ["projectId"],
+            where: {
+              projectId: { in: projectIds },
+              deadline: { lt: new Date() },
+              status: { not: "DONE" }
+            },
+            _count: { _all: true }
+          })
+        ]);
+
+  const doneByProject = new Map(doneGroups.map((g) => [g.projectId, g._count._all]));
+  const overdueByProject = new Map(overdueGroups.map((g) => [g.projectId, g._count._all]));
+
+  const projects = memberships.map((m) => {
+    const totalTasks = m.project._count.tasks;
+    const doneTasks = doneByProject.get(m.project.id) ?? 0;
+    const overdueTasks = overdueByProject.get(m.project.id) ?? 0;
+    const progressPercent =
+      totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+    return {
+      ...m.project,
+      myRole: m.role,
+      totalTasks,
+      doneTasks,
+      overdueTasks,
+      progressPercent
+    };
+  });
 
   return NextResponse.json(projects);
 }

@@ -6,6 +6,7 @@ import { MembersSection } from "@/components/project/MembersSection";
 import { TasksSection } from "@/components/project/TasksSection";
 import { AnalyticsSection } from "@/components/project/AnalyticsSection";
 import { ManageLabelsSection } from "@/components/labels/ManageLabelsSection";
+import { ProjectSummarySection } from "@/components/project/ProjectSummarySection";
 
 type Props = { params: Promise<{ projectId: string }> };
 
@@ -64,25 +65,21 @@ export default async function ProjectPage({ params }: Props) {
     byStatus[row.status] = row._count._all;
   }
 
+  const doneTasks = byStatus.DONE;
+  const progressPercent = total > 0 ? Math.round((doneTasks / total) * 100) : 0;
+
   return (
     <div className="mx-auto max-w-6xl">
-      <header className="mb-8">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-[var(--asana-text-secondary)] hover:text-[var(--asana-text-primary)] transition-colors mb-4"
-        >
-          <span aria-hidden>←</span>
-          Назад к дашборду
-        </Link>
-        <h1 className="page-title text-[var(--asana-text-primary)]">{project.name}</h1>
-        {project.description && (
-          <p className="mt-1.5 text-[var(--asana-text-secondary)]">{project.description}</p>
-        )}
-        <p className="mt-2 text-xs text-[var(--asana-text-placeholder)]">
-          Владелец: {project.owner.email}
-          {isOwner && " (вы)"}
-        </p>
-      </header>
+      <ProjectSummarySection
+        projectName={project.name}
+        projectDescription={project.description}
+        ownerEmail={project.owner.email}
+        isOwner={isOwner}
+        totalTasks={total}
+        doneTasks={doneTasks}
+        overdueTasks={overdue}
+        progressPercent={progressPercent}
+      />
 
       <div className="space-y-10">
         <MembersSection

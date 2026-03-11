@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { ProgressBar } from "@/components/ui/ProgressBar";
 
 type Project = {
   id: string;
@@ -10,6 +11,10 @@ type Project = {
   myRole: string;
   _count: { members: number; tasks: number };
   owner: { id: string; email: string; name: string | null };
+  totalTasks: number;
+  doneTasks: number;
+  overdueTasks: number;
+  progressPercent: number;
 };
 
 export function ProjectList() {
@@ -72,12 +77,20 @@ export function ProjectList() {
               <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-[var(--asana-text-secondary)]">
                 <span>{p._count.members} участников</span>
                 <span>·</span>
-                <span>{p._count.tasks} задач</span>
+                <span>{p.totalTasks} задач</span>
                 {p.myRole === "OWNER" && (
                   <span className="ml-1 rounded bg-[var(--asana-bg-card-hover)] px-2 py-0.5 font-medium text-[var(--asana-text-primary)]">
                     Владелец
                   </span>
                 )}
+              </div>
+              <div className="mt-4">
+                <ProgressBar
+                  value={p.progressPercent}
+                  size="sm"
+                  showPercent
+                  className="[--progress-track:var(--asana-bg-input)]"
+                />
               </div>
             </Link>
           </li>
