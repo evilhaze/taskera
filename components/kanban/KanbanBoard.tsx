@@ -12,8 +12,9 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { TaskModal } from "@/components/tasks/TaskModal";
 import { LabelBadge, type LabelShape } from "@/components/labels/LabelBadge";
+import { UserAvatar } from "@/components/avatar/UserAvatar";
 
-type Assignee = { id: string; email: string; name: string | null } | null;
+type Assignee = { id: string; email: string; name: string | null; avatarUrl?: string | null; avatarEmoji?: string | null } | null;
 
 export type KanbanTask = {
   id: string;
@@ -101,10 +102,13 @@ function TaskCard({
                   <span className="truncate max-w-[140px]" title={task.project.name}>{task.project.name}</span>
                 </span>
               )}
-              {task.assignee && (
-                <span title={task.assignee.email} className="max-w-[100px] truncate">
-                  {task.assignee.email}
+              {task.assignee ? (
+                <span className="flex items-center gap-1.5" title={task.assignee.email}>
+                  <UserAvatar user={task.assignee} size="xs" />
+                  <span className="max-w-[100px] truncate">{task.assignee.email}</span>
                 </span>
+              ) : (
+                <UserAvatar user={null} size="xs" title="Не назначен" />
               )}
               {deadlineStr && <span>{deadlineStr}</span>}
               <span

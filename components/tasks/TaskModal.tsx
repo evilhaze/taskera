@@ -8,8 +8,9 @@ import {
   FormEvent
 } from "react";
 import { LabelPicker } from "@/components/labels/LabelPicker";
+import { UserAvatar } from "@/components/avatar/UserAvatar";
 
-type User = { id: string; email: string; name: string | null };
+type User = { id: string; email: string; name: string | null; avatarUrl?: string | null; avatarEmoji?: string | null };
 type Comment = {
   id: string;
   content: string;
@@ -33,7 +34,7 @@ type Task = {
   comments?: Comment[];
   taskLabels?: { label: LabelShape }[];
 };
-type Member = { id: string; email: string; name: string | null };
+type Member = { id: string; email: string; name: string | null; avatarUrl?: string | null; avatarEmoji?: string | null };
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("ru-RU", {
@@ -133,7 +134,9 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
                   p.members.map((m: { user: Member }) => ({
                     id: m.user.id,
                     email: m.user.email,
-                    name: m.user.name
+                    name: m.user.name,
+                    avatarUrl: m.user.avatarUrl ?? undefined,
+                    avatarEmoji: m.user.avatarEmoji ?? undefined
                   }))
                 );
               } else setMembers([]);
@@ -292,12 +295,15 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
                     {(task.comments ?? []).map((c) => (
                       <li
                         key={c.id}
-                        className="rounded-lg border border-[var(--asana-border-subtle)] bg-[var(--asana-bg-input)]/50 px-3 py-2.5"
+                        className="flex gap-3 rounded-lg border border-[var(--asana-border-subtle)] bg-[var(--asana-bg-input)]/50 px-3 py-2.5"
                       >
-                        <p className="text-sm text-[var(--asana-text-primary)]">{c.content}</p>
-                        <p className="mt-1.5 text-xs text-[var(--asana-text-placeholder)]">
-                          {c.user.name || c.user.email} · {formatDate(c.createdAt)}
-                        </p>
+                        <UserAvatar user={c.user} size="sm" className="shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm text-[var(--asana-text-primary)]">{c.content}</p>
+                          <p className="mt-1.5 text-xs text-[var(--asana-text-placeholder)]">
+                            {c.user.name || c.user.email} · {formatDate(c.createdAt)}
+                          </p>
+                        </div>
                       </li>
                     ))}
                   </ul>
@@ -329,8 +335,11 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
                       <li>Обновлено {formatDate(task.updatedAt)}</li>
                     )}
                     {(task.comments ?? []).map((c) => (
-                      <li key={c.id}>
-                        {c.user.name || c.user.email} оставил комментарий · {formatDate(c.createdAt)}
+                      <li key={c.id} className="flex items-center gap-2">
+                        <UserAvatar user={c.user} size="xs" />
+                        <span>
+                          {c.user.name || c.user.email} оставил комментарий · {formatDate(c.createdAt)}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -343,19 +352,32 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
                   <label className="mb-1.5 block text-xs font-medium text-[var(--asana-text-secondary)]">
                     Исполнитель
                   </label>
-                  <select
-                    value={editedAssigneeId}
-                    onChange={(e) => setEditedAssigneeId(e.target.value)}
-                    className="input-base"
-                  >
-                    <option value="">Не назначен</option>
-                    {members.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.email}
-                        {m.name ? ` (${m.name})` : ""}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="flex items-center gap-2.5">
+                    {(() => {
+                      const selected = editedAssigneeId
+                        ? members.find((m) => m.id === editedAssigneeId) ?? task.assignee
+                        : null;
+                      return (
+                        <UserAvatar
+                          user={selected ?? null}
+                          size="sm"
+                        />
+                      );
+                    })()}
+                    <select
+                      value={editedAssigneeId}
+                      onChange={(e) => setEditedAssigneeId(e.target.value)}
+                      className="input-base flex-1"
+                    >
+                      <option value="">Не назначен</option>
+                      {members.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.email}
+                          {m.name ? ` (${m.name})` : ""}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-[var(--asana-text-secondary)]">

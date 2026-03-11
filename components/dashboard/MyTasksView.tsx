@@ -6,16 +6,17 @@ import Link from "next/link";
 import { CreateTaskForm } from "@/components/project/CreateTaskForm";
 import { KanbanBoard } from "@/components/kanban/KanbanBoard";
 import type { KanbanTask } from "@/components/kanban/KanbanBoard";
+import { UserAvatar } from "@/components/avatar/UserAvatar";
 
 type Project = { id: string; name: string };
-type Member = { id: string; email: string; name: string | null };
+type Member = { id: string; email: string; name: string | null; avatarUrl?: string | null; avatarEmoji?: string | null };
 
 export function MyTasksView({
   projects,
-  userInitials
+  user
 }: {
   projects: Project[];
-  userInitials: string;
+  user: { id: string; email: string; name: string | null; avatarUrl?: string | null; avatarEmoji?: string | null };
 }) {
   const router = useRouter();
   const [tasks, setTasks] = useState<KanbanTask[]>([]);
@@ -61,7 +62,9 @@ export function MyTasksView({
             p.members.map((m: { user: Member }) => ({
               id: m.user.id,
               email: m.user.email,
-              name: m.user.name
+              name: m.user.name,
+              avatarUrl: m.user.avatarUrl ?? undefined,
+              avatarEmoji: m.user.avatarEmoji ?? undefined
             }))
           );
         } else setMembers([]);
@@ -94,12 +97,7 @@ export function MyTasksView({
           <h1 className="page-title text-[var(--asana-text-primary)]">
             Мои задачи
           </h1>
-          <span
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--asana-blue)] text-sm font-semibold text-white"
-            aria-hidden
-          >
-            {userInitials}
-          </span>
+          <UserAvatar user={user} size="sm" title={user.email} />
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">

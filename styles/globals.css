@@ -56,6 +56,12 @@
     --label-purple-text: #B89AD4;
     --label-pink-bg: rgba(220, 140, 180, 0.25);
     --label-pink-text: #D89AB8;
+    /* Avatar fallback backgrounds — soft, premium */
+    --avatar-fallback-1: rgba(100, 116, 139, 0.45);
+    --avatar-fallback-2: rgba(59, 130, 246, 0.45);
+    --avatar-fallback-3: rgba(34, 197, 94, 0.45);
+    --avatar-fallback-4: rgba(245, 158, 11, 0.45);
+    --avatar-fallback-5: rgba(139, 92, 246, 0.45);
   }
 
   html {

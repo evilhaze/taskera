@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AddMemberForm } from "./AddMemberForm";
+import { UserAvatar } from "@/components/avatar/UserAvatar";
 
 type Member = {
   id: string;
   userId: string;
-  user: { id: string; email: string; name: string | null };
+  user: { id: string; email: string; name: string | null; avatarUrl?: string | null; avatarEmoji?: string | null };
 };
 
 type Props = {
@@ -73,13 +74,16 @@ export function MembersSection({
               key={m.id}
               className="flex flex-wrap items-center justify-between gap-4 px-5 py-3.5"
             >
-              <div className="min-w-0">
-                <span className="text-[var(--asana-text-primary)]">{m.user.email}</span>
-                {m.user.name && (
-                  <span className="ml-2 text-sm text-[var(--asana-text-secondary)]">
-                    {m.user.name}
-                  </span>
-                )}
+              <div className="flex min-w-0 items-center gap-3">
+                <UserAvatar user={m.user} size="sm" />
+                <div>
+                  <span className="text-[var(--asana-text-primary)]">{m.user.email}</span>
+                  {m.user.name && (
+                    <span className="ml-2 text-sm text-[var(--asana-text-secondary)]">
+                      {m.user.name}
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
                 <span className="text-xs font-medium text-[var(--asana-text-secondary)]">

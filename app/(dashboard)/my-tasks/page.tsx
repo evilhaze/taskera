@@ -14,14 +14,11 @@ export default async function MyTasksPage() {
     }
   });
   const projects = memberships.map((m) => m.project);
-  const initials = user.name
-    ? user.name.slice(0, 2).toUpperCase()
-    : user.email.slice(0, 2).toUpperCase();
 
   return (
     <MyTasksView
       projects={projects}
-      userInitials={initials}
+      user={user}
     />
   );
 }
