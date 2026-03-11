@@ -195,8 +195,8 @@ function DroppableColumn({
     <div
       ref={setNodeRef}
       className={
-        "min-h-[220px] flex-1 min-w-[280px] rounded-none border-0 bg-[var(--asana-bg-content)] px-2 py-4 transition-colors " +
-        (isOver ? "ring-2 ring-inset ring-[var(--asana-blue)]/50" : "")
+        "min-h-[220px] flex-1 min-w-[260px] max-w-[320px] rounded-lg border border-[var(--asana-border)] bg-[var(--asana-bg-input)] px-4 py-4 transition-colors " +
+        (isOver ? "ring-2 ring-[var(--asana-blue)]/50 ring-offset-2 ring-offset-[var(--asana-bg-content)]" : "")
       }
     >
       <h3 className="mb-3 text-sm font-semibold text-[var(--asana-text-primary)]">
@@ -205,7 +205,7 @@ function DroppableColumn({
           ({tasks.length})
         </span>
       </h3>
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         {tasks.map((task) => (
           <DraggableCard
             key={task.id}
@@ -291,7 +291,7 @@ export function KanbanBoard({
 
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-5">
         {STATUS_ORDER.map((status) => (
           <DroppableColumn
             key={status}
