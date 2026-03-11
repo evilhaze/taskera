@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { MembersSection } from "@/components/project/MembersSection";
 import { TasksSection } from "@/components/project/TasksSection";
+import { AnalyticsSection } from "@/components/project/AnalyticsSection";
 
 type Props = { params: Promise<{ projectId: string }> };
 
@@ -36,6 +37,32 @@ export default async function ProjectPage({ params }: Props) {
   const project = membership.project;
   const isOwner = membership.role === "OWNER";
 
+  const [total, byStatusRows, overdue] = await Promise.all([
+    prisma.task.count({ where: { projectId } }),
+    prisma.task.groupBy({
+      by: ["status"],
+      where: { projectId },
+      _count: { _all: true }
+    }),
+    prisma.task.count({
+      where: {
+        projectId,
+        deadline: { lt: new Date() },
+        status: { not: "DONE" }
+      }
+    })
+  ]);
+
+  const byStatus = {
+    TODO: 0,
+    IN_PROGRESS: 0,
+    REVIEW: 0,
+    DONE: 0
+  };
+  for (const row of byStatusRows) {
+    byStatus[row.status] = row._count._all;
+  }
+
   return (
     <div className="min-h-screen p-6 md:p-8">
       <div className="mx-auto max-w-6xl">
@@ -62,6 +89,12 @@ export default async function ProjectPage({ params }: Props) {
           ownerId={project.ownerId}
           currentUserId={user.id}
           isOwner={isOwner}
+        />
+
+        <AnalyticsSection
+          total={total}
+          byStatus={byStatus}
+          overdue={overdue}
         />
 
         <TasksSection
