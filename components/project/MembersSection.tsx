@@ -54,37 +54,35 @@ export function MembersSection({
   }
 
   return (
-    <section className="mb-8">
-      <h2 className="text-lg font-medium text-slate-200 mb-3">Участники</h2>
+    <section>
+      <h2 className="section-title mb-4">Участники</h2>
       {error && (
-        <p className="mb-3 text-sm text-red-400 bg-red-950/40 border border-red-900 rounded-md px-3 py-2">
-          {error}
-        </p>
+        <div className="mb-4 rounded-lg border border-red-900/60 bg-red-950/40 px-3 py-2.5">
+          <p className="text-sm text-red-300">{error}</p>
+        </div>
       )}
-      <ul className="rounded-lg border border-slate-700 bg-slate-900/50 divide-y divide-slate-700">
+      <div className="card overflow-hidden divide-y divide-zinc-800/80">
         {members.map((m) => {
           const isMemberOwner = m.userId === ownerId;
           const isCurrentUser = m.userId === currentUserId;
-          const canRemove =
-            isOwner && !isMemberOwner;
-          const canLeave =
-            isCurrentUser && !isMemberOwner;
+          const canRemove = isOwner && !isMemberOwner;
+          const canLeave = isCurrentUser && !isMemberOwner;
 
           return (
-            <li
+            <div
               key={m.id}
-              className="flex items-center justify-between gap-4 px-4 py-3"
+              className="flex flex-wrap items-center justify-between gap-4 px-5 py-3.5"
             >
               <div className="min-w-0">
-                <span className="text-slate-200">{m.user.email}</span>
+                <span className="text-zinc-200">{m.user.email}</span>
                 {m.user.name && (
-                  <span className="ml-2 text-slate-500 text-sm">
+                  <span className="ml-2 text-sm text-zinc-500">
                     {m.user.name}
                   </span>
                 )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-xs text-slate-500">
+                <span className="text-xs font-medium text-zinc-500">
                   {isMemberOwner ? "Владелец" : "Участник"}
                 </span>
                 {canRemove && (
@@ -92,7 +90,7 @@ export function MembersSection({
                     type="button"
                     onClick={() => handleRemove(m.userId)}
                     disabled={removingId !== null}
-                    className="rounded px-2 py-1 text-xs font-medium text-red-300 hover:bg-red-950/60 hover:text-red-200 disabled:opacity-50"
+                    className="rounded-lg px-2.5 py-1 text-xs font-medium text-red-400 hover:bg-red-950/50 hover:text-red-300 transition-colors disabled:opacity-50"
                   >
                     {removingId === m.userId ? "…" : "Удалить"}
                   </button>
@@ -102,16 +100,16 @@ export function MembersSection({
                     type="button"
                     onClick={() => handleRemove(m.userId)}
                     disabled={removingId !== null}
-                    className="rounded px-2 py-1 text-xs font-medium text-slate-400 hover:bg-slate-700 hover:text-slate-200 disabled:opacity-50"
+                    className="rounded-lg px-2.5 py-1 text-xs font-medium text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300 transition-colors disabled:opacity-50"
                   >
                     {removingId === m.userId ? "…" : "Покинуть"}
                   </button>
                 )}
               </div>
-            </li>
+            </div>
           );
         })}
-      </ul>
+      </div>
 
       {isOwner && (
         <div className="mt-4">

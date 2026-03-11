@@ -49,30 +49,25 @@ export default async function DashboardPage() {
   );
 
   return (
-    <div className="min-h-screen p-6 md:p-8">
-      <div className="mx-auto max-w-4xl">
-        <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
+    <div className="min-h-screen bg-[var(--app-bg)]">
+      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        <header className="mb-10 flex flex-wrap items-start justify-between gap-6">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-50">Dashboard</h1>
-            <p className="text-slate-400">
-              Вы вошли как <span className="text-slate-200">{user.email}</span>
+            <h1 className="page-title text-zinc-50">Дашборд</h1>
+            <p className="mt-1 text-sm text-zinc-500">
+              Вы вошли как{" "}
+              <span className="font-medium text-zinc-400">{user.email}</span>
             </p>
           </div>
           <form action="/api/auth/logout" method="POST">
-            <button
-              type="submit"
-              className="rounded-md bg-slate-700 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-600"
-            >
+            <button type="submit" className="btn-secondary">
               Выйти
             </button>
           </form>
         </header>
 
-        <div className="space-y-8">
-          <TodayAndOverdueTasks
-            overdue={overdue}
-            dueToday={dueToday}
-          />
+        <div className="space-y-10">
+          <TodayAndOverdueTasks overdue={overdue} dueToday={dueToday} />
           <CreateProjectForm />
           <ProjectList />
         </div>

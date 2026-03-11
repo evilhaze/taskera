@@ -25,46 +25,56 @@ export function ProjectList() {
       .finally(() => setLoading(false));
   }, []);
 
-  function onProjectCreated(project: Project) {
-    setProjects((prev) => [project, ...prev]);
-  }
-
   if (loading) {
     return (
-      <p className="text-slate-400 text-sm">Загрузка проектов...</p>
+      <section>
+        <h2 className="section-title mb-4">Мои проекты</h2>
+        <div className="card flex items-center justify-center py-12">
+          <div className="flex items-center gap-2 text-sm text-zinc-500">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-600 border-t-violet-500" />
+            Загрузка…
+          </div>
+        </div>
+      </section>
     );
   }
 
   if (projects.length === 0) {
     return (
-      <div className="rounded-lg border border-slate-700 bg-slate-900/50 p-6 text-center text-slate-400">
-        <p className="mb-2">Проектов пока нет.</p>
-        <p className="text-sm">Создайте первый проект с помощью формы выше.</p>
-      </div>
+      <section>
+        <h2 className="section-title mb-4">Мои проекты</h2>
+        <div className="card flex flex-col items-center justify-center py-14 text-center">
+          <p className="text-zinc-500">Проектов пока нет.</p>
+          <p className="mt-1 text-sm text-zinc-600">
+            Создайте первый проект с помощью формы выше.
+          </p>
+        </div>
+      </section>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <h2 className="text-lg font-medium text-slate-200">Мои проекты</h2>
-      <ul className="grid gap-2 sm:grid-cols-2">
+    <section>
+      <h2 className="section-title mb-4">Мои проекты</h2>
+      <ul className="grid gap-3 sm:grid-cols-2">
         {projects.map((p) => (
           <li key={p.id}>
             <Link
               href={`/projects/${p.id}`}
-              className="block rounded-lg border border-slate-700 bg-slate-800/80 p-4 transition hover:border-slate-600 hover:bg-slate-800"
+              className="card card-hover block p-5"
             >
-              <span className="font-medium text-slate-100">{p.name}</span>
+              <span className="font-medium text-zinc-100">{p.name}</span>
               {p.description && (
-                <p className="mt-1 line-clamp-2 text-sm text-slate-400">
+                <p className="mt-1.5 line-clamp-2 text-sm text-zinc-500">
                   {p.description}
                 </p>
               )}
-              <div className="mt-2 flex items-center gap-3 text-xs text-slate-500">
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-zinc-500">
                 <span>{p._count.members} участников</span>
+                <span>·</span>
                 <span>{p._count.tasks} задач</span>
                 {p.myRole === "OWNER" && (
-                  <span className="rounded bg-slate-700 px-1.5 py-0.5 text-slate-300">
+                  <span className="ml-1 rounded-md bg-zinc-700/80 px-2 py-0.5 font-medium text-zinc-300">
                     Владелец
                   </span>
                 )}
@@ -73,6 +83,6 @@ export function ProjectList() {
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   );
 }

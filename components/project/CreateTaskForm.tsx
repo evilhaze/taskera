@@ -51,36 +51,39 @@ export function CreateTaskForm({ projectId, members }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-slate-700 bg-slate-900/50 p-4">
-      <h3 className="text-md font-medium text-slate-200 mb-3">Новая задача</h3>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="sm:col-span-2">
-          <label className="block text-sm text-slate-400 mb-1">Название *</label>
+    <form onSubmit={handleSubmit} className="card p-5">
+      <h3 className="text-base font-medium text-zinc-200 mb-4">Новая задача</h3>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="sm:col-span-2 space-y-2">
+          <label className="block text-sm font-medium text-zinc-400">
+            Название *
+          </label>
           <input
             name="title"
             type="text"
             required
             maxLength={500}
-            className="w-full rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="input-base"
             placeholder="Краткое название"
           />
         </div>
-        <div className="sm:col-span-2">
-          <label className="block text-sm text-slate-400 mb-1">Описание</label>
+        <div className="sm:col-span-2 space-y-2">
+          <label className="block text-sm font-medium text-zinc-400">
+            Описание
+          </label>
           <textarea
             name="description"
             rows={2}
             maxLength={5000}
-            className="w-full rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 resize-none"
+            className="input-base resize-none"
             placeholder="Подробности (необязательно)"
           />
         </div>
-        <div>
-          <label className="block text-sm text-slate-400 mb-1">Исполнитель</label>
-          <select
-            name="assigneeId"
-            className="w-full rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-          >
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-zinc-400">
+            Исполнитель
+          </label>
+          <select name="assigneeId" className="input-base">
             <option value="">— Не назначен —</option>
             {members.map((m) => (
               <option key={m.id} value={m.id}>
@@ -90,20 +93,21 @@ export function CreateTaskForm({ projectId, members }: Props) {
             ))}
           </select>
         </div>
-        <div>
-          <label className="block text-sm text-slate-400 mb-1">Дедлайн</label>
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-zinc-400">
+            Дедлайн
+          </label>
           <input
             name="deadline"
             type="datetime-local"
-            className="w-full rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="input-base"
           />
         </div>
-        <div>
-          <label className="block text-sm text-slate-400 mb-1">Приоритет</label>
-          <select
-            name="priority"
-            className="w-full rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
-          >
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-zinc-400">
+            Приоритет
+          </label>
+          <select name="priority" className="input-base">
             <option value="LOW">Низкий</option>
             <option value="MEDIUM">Средний</option>
             <option value="HIGH">Высокий</option>
@@ -111,12 +115,14 @@ export function CreateTaskForm({ projectId, members }: Props) {
         </div>
       </div>
       {error && (
-        <p className="mt-2 text-sm text-red-400">{error}</p>
+        <div className="mt-4 rounded-lg border border-red-900/60 bg-red-950/40 px-3 py-2.5">
+          <p className="text-sm text-red-300">{error}</p>
+        </div>
       )}
       <button
         type="submit"
         disabled={loading}
-        className="mt-3 rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:opacity-70"
+        className="btn-primary mt-4"
       >
         {loading ? "Создание…" : "Создать задачу"}
       </button>

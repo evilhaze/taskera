@@ -38,9 +38,12 @@ export function AddMemberForm({ projectId, onSuccess }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-2">
-      <div className="min-w-[200px] flex-1">
-        <label htmlFor="member-email" className="block text-sm text-slate-400 mb-1">
+    <form onSubmit={handleSubmit} className="flex flex-wrap items-end gap-3">
+      <div className="min-w-[200px] flex-1 space-y-1.5">
+        <label
+          htmlFor="member-email"
+          className="block text-sm font-medium text-zinc-400"
+        >
           Добавить по email
         </label>
         <input
@@ -49,21 +52,17 @@ export function AddMemberForm({ projectId, onSuccess }: Props) {
           type="email"
           required
           placeholder="user@example.com"
-          className="w-full rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+          className="input-base"
         />
       </div>
-      <button
-        type="submit"
-        disabled={loading}
-        className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:opacity-70"
-      >
+      <button type="submit" disabled={loading} className="btn-primary">
         {loading ? "Добавление…" : "Добавить"}
       </button>
       {error && (
         <p className="w-full text-sm text-red-400">{error}</p>
       )}
       {success && (
-        <p className="w-full text-sm text-green-400">{success}</p>
+        <p className="w-full text-sm text-emerald-400">{success}</p>
       )}
     </form>
   );

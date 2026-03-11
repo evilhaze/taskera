@@ -64,47 +64,50 @@ export default async function ProjectPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen p-6 md:p-8">
-      <div className="mx-auto max-w-6xl">
-        <header className="mb-6">
+    <div className="min-h-screen bg-[var(--app-bg)]">
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <header className="mb-10">
           <Link
             href="/"
-            className="text-sm text-slate-400 hover:text-slate-200 mb-2 inline-block"
+            className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-300 transition-colors mb-4"
           >
-            ← Назад к дашборду
+            <span aria-hidden>←</span>
+            Назад к дашборду
           </Link>
-          <h1 className="text-2xl font-semibold text-slate-50">{project.name}</h1>
+          <h1 className="page-title text-zinc-50">{project.name}</h1>
           {project.description && (
-            <p className="mt-1 text-slate-400">{project.description}</p>
+            <p className="mt-1.5 text-zinc-500">{project.description}</p>
           )}
-          <p className="mt-2 text-xs text-slate-500">
+          <p className="mt-2 text-xs text-zinc-600">
             Владелец: {project.owner.email}
             {isOwner && " (вы)"}
           </p>
         </header>
 
-        <MembersSection
-          projectId={project.id}
-          members={project.members}
-          ownerId={project.ownerId}
-          currentUserId={user.id}
-          isOwner={isOwner}
-        />
+        <div className="space-y-10">
+          <MembersSection
+            projectId={project.id}
+            members={project.members}
+            ownerId={project.ownerId}
+            currentUserId={user.id}
+            isOwner={isOwner}
+          />
 
-        <AnalyticsSection
-          total={total}
-          byStatus={byStatus}
-          overdue={overdue}
-        />
+          <AnalyticsSection
+            total={total}
+            byStatus={byStatus}
+            overdue={overdue}
+          />
 
-        <TasksSection
-          projectId={project.id}
-          members={project.members.map((m) => ({
-            id: m.user.id,
-            email: m.user.email,
-            name: m.user.name
-          }))}
-        />
+          <TasksSection
+            projectId={project.id}
+            members={project.members.map((m) => ({
+              id: m.user.id,
+              email: m.user.email,
+              name: m.user.name
+            }))}
+          />
+        </div>
       </div>
     </div>
   );

@@ -65,18 +65,26 @@ export function TasksSection({ projectId, members }: Props) {
   }
 
   return (
-    <section className="mb-8">
-      <h2 className="text-lg font-medium text-slate-200 mb-3">Задачи</h2>
+    <section>
+      <h2 className="section-title mb-4">Задачи</h2>
 
       <div className="mb-6">
         <CreateTaskForm projectId={projectId} members={members} />
       </div>
 
       {loading ? (
-        <p className="text-slate-400 text-sm">Загрузка задач…</p>
+        <div className="card flex items-center justify-center py-16">
+          <div className="flex items-center gap-2 text-sm text-zinc-500">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-600 border-t-violet-500" />
+            Загрузка задач…
+          </div>
+        </div>
       ) : tasks.length === 0 ? (
-        <div className="rounded-lg border border-slate-700 bg-slate-900/50 p-6 text-center text-slate-400">
-          Задач пока нет. Создайте первую задачу выше.
+        <div className="card flex flex-col items-center justify-center py-16 text-center">
+          <p className="text-zinc-500">Задач пока нет.</p>
+          <p className="mt-1 text-sm text-zinc-600">
+            Создайте первую задачу выше.
+          </p>
         </div>
       ) : (
         <KanbanBoard

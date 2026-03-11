@@ -35,11 +35,14 @@ export function CreateProjectForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-slate-700 bg-slate-900/50 p-4">
-      <h2 className="text-lg font-medium text-slate-200 mb-3">Новый проект</h2>
-      <div className="space-y-3">
-        <div>
-          <label htmlFor="project-name" className="block text-sm text-slate-400 mb-1">
+    <form onSubmit={handleSubmit} className="card p-5">
+      <h2 className="section-title mb-4">Новый проект</h2>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <label
+            htmlFor="project-name"
+            className="block text-sm font-medium text-zinc-400"
+          >
             Название
           </label>
           <input
@@ -48,12 +51,15 @@ export function CreateProjectForm() {
             type="text"
             required
             maxLength={200}
-            className="w-full rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            className="input-base"
             placeholder="Например: Веб-сайт"
           />
         </div>
-        <div>
-          <label htmlFor="project-desc" className="block text-sm text-slate-400 mb-1">
+        <div className="space-y-2">
+          <label
+            htmlFor="project-desc"
+            className="block text-sm font-medium text-zinc-400"
+          >
             Описание (необязательно)
           </label>
           <textarea
@@ -61,20 +67,16 @@ export function CreateProjectForm() {
             name="description"
             rows={2}
             maxLength={2000}
-            className="w-full rounded-md border border-slate-600 bg-slate-950 px-3 py-2 text-slate-100 placeholder-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 resize-none"
+            className="input-base resize-none"
             placeholder="Кратко о проекте"
           />
         </div>
         {error && (
-          <p className="text-sm text-red-400 bg-red-950/40 border border-red-900 rounded-md px-3 py-2">
-            {error}
-          </p>
+          <div className="rounded-lg border border-red-900/60 bg-red-950/40 px-3 py-2.5">
+            <p className="text-sm text-red-300">{error}</p>
+          </div>
         )}
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-500 disabled:opacity-70"
-        >
+        <button type="submit" disabled={loading} className="btn-primary">
           {loading ? "Создание…" : "Создать проект"}
         </button>
       </div>

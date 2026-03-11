@@ -29,53 +29,59 @@ export function TodayAndOverdueTasks({ overdue, dueToday }: Props) {
   if (!hasAny) return null;
 
   return (
-    <section className="mb-8">
-      <h2 className="text-lg font-medium text-slate-200 mb-3">Уведомления</h2>
+    <section>
+      <h2 className="section-title mb-4">Уведомления</h2>
       <div className="space-y-4">
         {overdue.length > 0 && (
-          <div className="rounded-lg border border-red-800/60 bg-red-950/30 p-4">
-            <h3 className="text-sm font-medium text-red-200 mb-2">
-              Просроченные задачи ({overdue.length})
-            </h3>
-            <ul className="space-y-2">
-              {overdue.map((task) => (
-                <li key={task.id}>
-                  <Link
-                    href={`/projects/${task.project.id}`}
-                    className="flex flex-wrap items-baseline gap-2 text-sm text-slate-200 hover:text-sky-300"
-                  >
-                    <span className="font-medium">{task.title}</span>
-                    <span className="text-slate-500">
-                      {task.project.name}
-                      {task.deadline && ` · ${formatDeadline(task.deadline)}`}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <div className="card overflow-hidden border-red-900/50 bg-red-950/20">
+            <div className="px-5 py-4">
+              <h3 className="text-sm font-medium text-red-200/90">
+                Просроченные ({overdue.length})
+              </h3>
+              <ul className="mt-3 space-y-2">
+                {overdue.map((task) => (
+                  <li key={task.id}>
+                    <Link
+                      href={`/projects/${task.project.id}`}
+                      className="flex flex-wrap items-baseline gap-2 text-sm text-zinc-300 hover:text-violet-300 transition-colors"
+                    >
+                      <span className="font-medium">{task.title}</span>
+                      <span className="text-zinc-500">
+                        {task.project.name}
+                        {task.deadline &&
+                          ` · ${formatDeadline(task.deadline)}`}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         )}
         {dueToday.length > 0 && (
-          <div className="rounded-lg border border-amber-800/50 bg-amber-950/20 p-4">
-            <h3 className="text-sm font-medium text-amber-200 mb-2">
-              На сегодня ({dueToday.length})
-            </h3>
-            <ul className="space-y-2">
-              {dueToday.map((task) => (
-                <li key={task.id}>
-                  <Link
-                    href={`/projects/${task.project.id}`}
-                    className="flex flex-wrap items-baseline gap-2 text-sm text-slate-200 hover:text-sky-300"
-                  >
-                    <span className="font-medium">{task.title}</span>
-                    <span className="text-slate-500">
-                      {task.project.name}
-                      {task.deadline && ` · ${formatDeadline(task.deadline)}`}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <div className="card overflow-hidden border-amber-900/40 bg-amber-950/10">
+            <div className="px-5 py-4">
+              <h3 className="text-sm font-medium text-amber-200/90">
+                На сегодня ({dueToday.length})
+              </h3>
+              <ul className="mt-3 space-y-2">
+                {dueToday.map((task) => (
+                  <li key={task.id}>
+                    <Link
+                      href={`/projects/${task.project.id}`}
+                      className="flex flex-wrap items-baseline gap-2 text-sm text-zinc-300 hover:text-violet-300 transition-colors"
+                    >
+                      <span className="font-medium">{task.title}</span>
+                      <span className="text-zinc-500">
+                        {task.project.name}
+                        {task.deadline &&
+                          ` · ${formatDeadline(task.deadline)}`}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         )}
       </div>

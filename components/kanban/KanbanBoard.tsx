@@ -67,29 +67,33 @@ function TaskCard({
   return (
     <div
       className={
-        "rounded-lg border bg-slate-800/95 p-3 shadow " +
+        "rounded-lg border bg-zinc-900/95 p-3.5 shadow-card transition-colors " +
         (isOverlay
-          ? "border-sky-500 ring-2 ring-sky-500/50 cursor-grabbing"
-          : "border-slate-600 hover:border-slate-500")
+          ? "border-violet-500/80 ring-2 ring-violet-500/30 cursor-grabbing"
+          : "border-zinc-700/80 hover:border-zinc-600")
       }
     >
-      <p className="font-medium text-slate-100">{task.title}</p>
+      <p className="font-medium text-zinc-100">{task.title}</p>
       {task.description && (
-        <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">
+        <p className="mt-1 line-clamp-2 text-xs text-zinc-500">
           {task.description}
         </p>
       )}
-      <div className="mt-2 flex flex-wrap gap-2 text-xs text-slate-500">
+      <div className="mt-2.5 flex flex-wrap gap-2 text-xs text-zinc-500">
         {task.assignee && (
-          <span title={task.assignee.email}>{task.assignee.email}</span>
+          <span title={task.assignee.email} className="truncate max-w-[120px]">
+            {task.assignee.email}
+          </span>
         )}
-        {deadlineStr && <span>📅 {deadlineStr}</span>}
+        {deadlineStr && (
+          <span className="text-zinc-600">{deadlineStr}</span>
+        )}
         <span
           className={
             task.priority === "HIGH"
-              ? "text-amber-400"
+              ? "font-medium text-amber-400/90"
               : task.priority === "LOW"
-                ? "text-slate-500"
+                ? "text-zinc-600"
                 : ""
           }
         >
@@ -134,7 +138,7 @@ function DraggableCard({
       {...attributes}
       className={
         "cursor-grab active:cursor-grabbing " +
-        (isDragging ? "opacity-50" : "")
+        (isDragging ? "opacity-40" : "")
       }
     >
       <div className="relative group">
@@ -146,7 +150,7 @@ function DraggableCard({
             onDelete(task.id);
           }}
           disabled={deletingId !== null}
-          className="absolute top-2 right-2 rounded bg-slate-700/90 px-2 py-0.5 text-xs text-red-300 opacity-0 group-hover:opacity-100 hover:bg-red-950/80 disabled:opacity-50"
+          className="absolute top-2 right-2 rounded-lg bg-zinc-800/95 px-2 py-1 text-xs font-medium text-red-400/90 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-950/60 hover:text-red-300 disabled:opacity-50"
         >
           {deletingId === task.id ? "…" : "Удалить"}
         </button>
@@ -174,14 +178,16 @@ function DroppableColumn({
     <div
       ref={setNodeRef}
       className={
-        "min-h-[200px] flex-1 min-w-[240px] rounded-lg border-2 border-dashed p-3 transition-colors " +
-        (isOver ? "border-sky-500 bg-sky-950/30" : "border-slate-600 bg-slate-900/30")
+        "min-h-[220px] flex-1 min-w-[260px] rounded-card border-2 border-dashed p-4 transition-colors duration-200 " +
+        (isOver
+          ? "border-violet-500/50 bg-violet-950/20"
+          : "border-zinc-800 bg-zinc-900/30")
       }
     >
-      <h3 className="mb-2 text-sm font-medium text-slate-400">
+      <h3 className="mb-3 text-sm font-medium text-zinc-500">
         {label} ({tasks.length})
       </h3>
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         {tasks.map((task) => (
           <DraggableCard
             key={task.id}
@@ -252,7 +258,7 @@ export function KanbanBoard({
 
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-5">
         {STATUS_ORDER.map((status) => (
           <DroppableColumn
             key={status}
