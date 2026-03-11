@@ -6,6 +6,9 @@ import {
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
   useDraggable,
   useDroppable
 } from "@dnd-kit/core";
@@ -75,10 +78,10 @@ function TaskCard({
   return (
     <div
       className={
-        "rounded-lg border bg-[var(--asana-bg-card)] p-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.3)] transition-colors " +
+        "rounded-lg border bg-[var(--asana-bg-card)] p-3.5 transition-all duration-200 " +
         (isOverlay
-          ? "border-[var(--asana-blue)]/60 shadow-[0_8px_24px_rgba(0,0,0,0.5)] cursor-grabbing opacity-95"
-          : "border-[var(--asana-border)] hover:bg-[var(--asana-bg-card-hover)] hover:border-[#4A4A62] hover:shadow-[0_4px_12px_rgba(0,0,0,0.4)]")
+          ? "border-[var(--asana-blue)]/50 shadow-[0_12px_40px_rgba(0,0,0,0.45)] cursor-grabbing scale-[1.02] ring-2 ring-[var(--asana-blue)]/20"
+          : "border-[var(--asana-border)] shadow-[0_1px_3px_rgba(0,0,0,0.25)] hover:border-[var(--asana-border)] hover:bg-[var(--asana-bg-card-hover)] hover:shadow-[0_4px_14px_rgba(0,0,0,0.35)]")
       }
     >
       <div className="flex items-start gap-2">
@@ -154,10 +157,10 @@ function DraggableCard({
     data: { task }
   });
 
-  const style = transform
-    ? {
-        transform: CSS.Translate.toString(transform)
-      }
+  // When dragging, don't apply transform — DragOverlay shows the moving card.
+  // Original slot stays in place with reduced opacity for insertion feedback.
+  const style = !isDragging && transform
+    ? { transform: CSS.Translate.toString(transform) }
     : undefined;
 
   return (
@@ -165,15 +168,15 @@ function DraggableCard({
       ref={setNodeRef}
       style={style}
       className={
-        "flex items-stretch gap-1 " +
-        (isDragging ? "opacity-40" : "")
+        "flex items-stretch gap-1 transition-opacity duration-200 " +
+        (isDragging ? "opacity-30" : "opacity-100")
       }
     >
       {/* Ручка перетаскивания — только за неё тянем */}
       <div
         {...listeners}
         {...attributes}
-        className="shrink-0 cursor-grab active:cursor-grabbing touch-none self-center rounded p-1.5 -ml-0.5 text-[var(--asana-text-placeholder)] hover:bg-white/5 hover:text-[var(--asana-text-secondary)]"
+        className="shrink-0 cursor-grab active:cursor-grabbing touch-none self-center rounded p-1.5 -ml-0.5 text-[var(--asana-text-placeholder)] hover:bg-white/5 hover:text-[var(--asana-text-secondary)] transition-colors"
         title="Перетащить"
         aria-label="Перетащить"
         onClick={(e) => e.stopPropagation()}
@@ -193,7 +196,7 @@ function DraggableCard({
             onTaskClick?.(task.id);
           }
         }}
-        className="relative group flex-1 min-w-0 cursor-pointer rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--asana-blue)]/50 focus:ring-offset-2 focus:ring-offset-[var(--asana-bg-input)]"
+        className="relative group flex-1 min-w-0 cursor-pointer rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--asana-blue)]/50 focus:ring-offset-2 focus:ring-offset-[var(--asana-bg-input)] transition-shadow duration-200"
       >
         <TaskCard task={task} showProjectInCard={showProjectInCard} />
         <button
@@ -237,8 +240,10 @@ function DroppableColumn({
     <div
       ref={setNodeRef}
       className={
-        "min-h-[220px] flex-1 min-w-[260px] max-w-[320px] rounded-lg border border-[var(--asana-border)] bg-[var(--asana-bg-input)] px-4 py-4 transition-colors " +
-        (isOver ? "ring-2 ring-[var(--asana-blue)]/50 ring-offset-2 ring-offset-[var(--asana-bg-content)]" : "")
+        "min-h-[220px] flex-1 min-w-[260px] max-w-[320px] rounded-xl border px-4 py-4 transition-all duration-200 " +
+        (isOver
+          ? "border-[var(--asana-blue)]/50 bg-[var(--asana-blue)]/5"
+          : "border-[var(--asana-border)] bg-[var(--asana-bg-input)]")
       }
     >
       <h3 className="mb-3 text-sm font-semibold text-[var(--asana-text-primary)]">
@@ -258,6 +263,14 @@ function DroppableColumn({
             onTaskClick={onTaskClick}
           />
         ))}
+        {isOver && (
+          <div
+            className="rounded-md border-2 border-dashed border-[var(--asana-blue)]/30 bg-[var(--asana-blue)]/5 py-3 text-center text-xs text-[var(--asana-text-placeholder)] transition-opacity duration-200"
+            aria-hidden
+          >
+            Отпустите здесь
+          </div>
+        )}
         {onAddTaskInColumn && (
           <button
             type="button"
@@ -296,6 +309,12 @@ export function KanbanBoard({
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTaskId, setModalTaskId] = useState<string | null>(null);
   const justDraggedRef = useRef(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 }
+    })
+  );
 
   const activeTask = activeId
     ? tasks.find((t) => t.id === activeId) ?? null
@@ -347,7 +366,11 @@ export function KanbanBoard({
   );
 
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
       <div className="flex flex-wrap gap-5">
         {STATUS_ORDER.map((status) => (
           <DroppableColumn
