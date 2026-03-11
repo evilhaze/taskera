@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   DndContext,
   DragEndEvent,
@@ -10,6 +10,7 @@ import {
   useDroppable
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+import { TaskModal } from "@/components/tasks/TaskModal";
 
 type Assignee = { id: string; email: string; name: string | null } | null;
 
@@ -119,12 +120,14 @@ function DraggableCard({
   task,
   onDelete,
   deletingId,
-  showProjectInCard = false
+  showProjectInCard = false,
+  onTaskClick
 }: {
   task: KanbanTask;
   onDelete: (id: string) => void;
   deletingId: string | null;
   showProjectInCard?: boolean;
+  onTaskClick?: (taskId: string) => void;
 }) {
   const {
     attributes,
@@ -147,14 +150,37 @@ function DraggableCard({
     <div
       ref={setNodeRef}
       style={style}
-      {...listeners}
-      {...attributes}
       className={
-        "cursor-grab active:cursor-grabbing " +
+        "flex items-stretch gap-1 " +
         (isDragging ? "opacity-40" : "")
       }
     >
-      <div className="relative group">
+      {/* Ручка перетаскивания — только за неё тянем */}
+      <div
+        {...listeners}
+        {...attributes}
+        className="shrink-0 cursor-grab active:cursor-grabbing touch-none self-center rounded p-1.5 -ml-0.5 text-[var(--asana-text-placeholder)] hover:bg-white/5 hover:text-[var(--asana-text-secondary)]"
+        title="Перетащить"
+        aria-label="Перетащить"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 16 16" aria-hidden>
+          <path d="M5 3a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM5 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+        </svg>
+      </div>
+      {/* Контент карточки — клик открывает модалку */}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => onTaskClick?.(task.id)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onTaskClick?.(task.id);
+          }
+        }}
+        className="relative group flex-1 min-w-0 cursor-pointer rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--asana-blue)]/50 focus:ring-offset-2 focus:ring-offset-[var(--asana-bg-input)]"
+      >
         <TaskCard task={task} showProjectInCard={showProjectInCard} />
         <button
           type="button"
@@ -179,7 +205,8 @@ function DroppableColumn({
   onDelete,
   deletingId,
   onAddTaskInColumn,
-  showProjectInCard
+  showProjectInCard,
+  onTaskClick
 }: {
   status: string;
   label: string;
@@ -188,6 +215,7 @@ function DroppableColumn({
   deletingId: string | null;
   onAddTaskInColumn?: () => void;
   showProjectInCard?: boolean;
+  onTaskClick?: (taskId: string) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: status });
 
@@ -213,6 +241,7 @@ function DroppableColumn({
             onDelete={onDelete}
             deletingId={deletingId}
             showProjectInCard={showProjectInCard}
+            onTaskClick={onTaskClick}
           />
         ))}
         {onAddTaskInColumn && (
@@ -250,17 +279,25 @@ export function KanbanBoard({
   showProjectInCard = false
 }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalTaskId, setModalTaskId] = useState<string | null>(null);
+  const justDraggedRef = useRef(false);
 
   const activeTask = activeId
     ? tasks.find((t) => t.id === activeId) ?? null
     : null;
 
   function handleDragStart(e: DragStartEvent) {
+    justDraggedRef.current = false;
     setActiveId(e.active.id as string);
   }
 
   async function handleDragEnd(e: DragEndEvent) {
     setActiveId(null);
+    justDraggedRef.current = true;
+    setTimeout(() => {
+      justDraggedRef.current = false;
+    }, 150);
     const { active, over } = e;
     if (!over) return;
 
@@ -279,6 +316,12 @@ export function KanbanBoard({
     });
 
     if (res.ok) onTaskMoved();
+  }
+
+  function handleTaskClick(taskId: string) {
+    if (justDraggedRef.current) return;
+    setModalTaskId(taskId);
+    setModalOpen(true);
   }
 
   const byStatus = STATUS_ORDER.reduce(
@@ -302,9 +345,20 @@ export function KanbanBoard({
             deletingId={deletingId}
             onAddTaskInColumn={onAddTaskInColumn}
             showProjectInCard={showProjectInCard}
+            onTaskClick={handleTaskClick}
           />
         ))}
       </div>
+
+      <TaskModal
+        taskId={modalTaskId}
+        open={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setModalTaskId(null);
+        }}
+        onSaved={onTaskMoved}
+      />
 
       <DragOverlay>
         {activeTask ? <TaskCard task={activeTask} isOverlay showProjectInCard={showProjectInCard} /> : null}

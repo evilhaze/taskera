@@ -8,7 +8,13 @@ async function ensureTaskAccess(userId: string, taskId: string) {
     where: { id: taskId },
     include: {
       project: true,
-      assignee: { select: { id: true, email: true, name: true } }
+      assignee: { select: { id: true, email: true, name: true } },
+      comments: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          user: { select: { id: true, email: true, name: true } }
+        }
+      }
     }
   });
   if (!task) return null;
@@ -117,7 +123,14 @@ export async function PATCH(
     where: { id: taskId },
     data: updatePayload,
     include: {
-      assignee: { select: { id: true, email: true, name: true } }
+      assignee: { select: { id: true, email: true, name: true } },
+      project: { select: { id: true, name: true } },
+      comments: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          user: { select: { id: true, email: true, name: true } }
+        }
+      }
     }
   });
 
