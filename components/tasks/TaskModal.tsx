@@ -9,6 +9,7 @@ import {
 } from "react";
 import { LabelPicker } from "@/components/labels/LabelPicker";
 import { UserAvatar } from "@/components/avatar/UserAvatar";
+import { PriorityBadge } from "@/components/priority/PriorityBadge";
 import { ActivityFeed } from "@/components/activity/ActivityFeed";
 import type { ActivityItemType } from "@/components/activity/ActivityItem";
 
@@ -405,15 +406,22 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
                   <label className="mb-1.5 block text-xs font-medium text-[var(--asana-text-secondary)]">
                     Приоритет
                   </label>
-                  <select
-                    value={editedPriority}
-                    onChange={(e) => setEditedPriority(e.target.value)}
-                    className="input-base"
-                  >
-                    {PRIORITY_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <PriorityBadge
+                      priority={editedPriority as "LOW" | "MEDIUM" | "HIGH"}
+                      size="md"
+                      showLabel
+                    />
+                    <select
+                      value={editedPriority}
+                      onChange={(e) => setEditedPriority(e.target.value)}
+                      className="input-base flex-1 min-w-[120px]"
+                    >
+                      {PRIORITY_OPTIONS.map((o) => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-[var(--asana-text-secondary)]">

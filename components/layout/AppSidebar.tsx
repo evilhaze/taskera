@@ -33,7 +33,6 @@ export function AppSidebar() {
   const isHome = pathname === "/";
   const isMyTasks = pathname === "/my-tasks";
   const isNotifications = pathname === "/notifications";
-  const isProfile = pathname === "/settings/profile";
   const projectId = pathname.startsWith("/projects/") ? pathname.split("/")[2] : null;
 
   return (
@@ -76,23 +75,6 @@ export function AppSidebar() {
         >
           <span className="text-[var(--asana-text-secondary)]">🔔</span>
           Уведомления
-        </Link>
-
-        <div className="mt-3 px-2.5 pb-1 pt-2">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--asana-text-secondary)]">
-            Настройки
-          </span>
-        </div>
-        <Link
-          href="/settings/profile"
-          className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors ${
-            isProfile
-              ? "bg-white/10 text-[var(--asana-text-primary)]"
-              : "text-[var(--asana-text-secondary)] hover:bg-white/5 hover:text-[var(--asana-text-primary)]"
-          }`}
-        >
-          <span className="text-[var(--asana-text-secondary)]">👤</span>
-          Профиль
         </Link>
 
         <div className="mt-3 px-2.5 pb-1 pt-2">

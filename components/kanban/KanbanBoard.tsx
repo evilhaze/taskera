@@ -15,6 +15,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { TaskModal } from "@/components/tasks/TaskModal";
 import { LabelBadge, type LabelShape } from "@/components/labels/LabelBadge";
+import { PriorityBadge } from "@/components/priority/PriorityBadge";
 import { UserAvatar } from "@/components/avatar/UserAvatar";
 
 type Assignee = { id: string; email: string; name: string | null; avatarUrl?: string | null; avatarEmoji?: string | null } | null;
@@ -44,12 +45,6 @@ const STATUS_LABELS: Record<string, string> = {
   IN_PROGRESS: "В работе",
   REVIEW: "На проверке",
   DONE: "Готово"
-};
-
-const PRIORITY_LABELS: Record<string, string> = {
-  LOW: "Низкий",
-  MEDIUM: "Средний",
-  HIGH: "Высокий"
 };
 
 function formatDeadline(iso: string | null) {
@@ -90,7 +85,7 @@ function TaskCard({
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium leading-snug text-[var(--asana-text-primary)]">{task.title}</p>
-          {(labels.length > 0 || (showProjectInCard && task.project) || task.assignee || deadlineStr) ? (
+          {(labels.length > 0 || (showProjectInCard && task.project) || task.assignee || deadlineStr || task.priority) ? (
             <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-xs text-[var(--asana-text-secondary)]">
               {labels.length > 0 && (
                 <span className="flex flex-wrap gap-1">
@@ -114,17 +109,7 @@ function TaskCard({
                 <UserAvatar user={null} size="xs" title="Не назначен" />
               )}
               {deadlineStr && <span>{deadlineStr}</span>}
-              <span
-                className={
-                  task.priority === "HIGH"
-                    ? "font-medium text-[#FF7070]"
-                    : task.priority === "LOW"
-                      ? "text-[var(--asana-text-placeholder)]"
-                      : ""
-                }
-              >
-                {PRIORITY_LABELS[task.priority] ?? task.priority}
-              </span>
+              <PriorityBadge priority={task.priority} size="sm" showLabel={false} />
             </div>
           ) : null}
         </div>

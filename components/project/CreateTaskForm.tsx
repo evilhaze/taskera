@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { PriorityBadge } from "@/components/priority/PriorityBadge";
 
 type Member = { id: string; email: string; name: string | null };
 
@@ -12,6 +13,7 @@ type Props = {
 export function CreateTaskForm({ projectId, members }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [priority, setPriority] = useState<"LOW" | "MEDIUM" | "HIGH">("MEDIUM");
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -24,7 +26,6 @@ export function CreateTaskForm({ projectId, members }: Props) {
     const assigneeId = (form.elements.namedItem("assigneeId") as HTMLSelectElement).value || null;
     const deadlineRaw = (form.elements.namedItem("deadline") as HTMLInputElement).value;
     const deadline = deadlineRaw ? new Date(deadlineRaw).toISOString() : null;
-    const priority = (form.elements.namedItem("priority") as HTMLSelectElement).value as "LOW" | "MEDIUM" | "HIGH";
 
     const res = await fetch(`/api/projects/${projectId}/tasks`, {
       method: "POST",
@@ -47,6 +48,7 @@ export function CreateTaskForm({ projectId, members }: Props) {
     }
 
     form.reset();
+    setPriority("MEDIUM");
     window.dispatchEvent(new CustomEvent("task-created", { detail: data }));
   }
 
@@ -103,11 +105,19 @@ export function CreateTaskForm({ projectId, members }: Props) {
           <label className="block text-sm font-medium text-[var(--asana-text-secondary)]">
             Приоритет
           </label>
-          <select name="priority" className="input-base">
-            <option value="LOW">Низкий</option>
-            <option value="MEDIUM">Средний</option>
-            <option value="HIGH">Высокий</option>
-          </select>
+          <div className="flex flex-wrap items-center gap-2">
+            <PriorityBadge priority={priority} size="md" showLabel />
+            <select
+              name="priority"
+              value={priority}
+              onChange={(e) => setPriority(e.target.value as "LOW" | "MEDIUM" | "HIGH")}
+              className="input-base flex-1 min-w-[120px]"
+            >
+              <option value="LOW">Низкий</option>
+              <option value="MEDIUM">Средний</option>
+              <option value="HIGH">Высокий</option>
+            </select>
+          </div>
         </div>
       </div>
       {error && (

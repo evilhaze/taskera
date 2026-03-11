@@ -72,6 +72,7 @@ export default async function ProjectPage({ params }: Props) {
   return (
     <div className="mx-auto max-w-6xl">
       <ProjectSummarySection
+        projectId={project.id}
         projectName={project.name}
         projectDescription={project.description}
         ownerEmail={project.owner.email}
