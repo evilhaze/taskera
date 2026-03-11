@@ -14,6 +14,11 @@ async function ensureTaskAccess(userId: string, taskId: string) {
         include: {
           user: { select: { id: true, email: true, name: true } }
         }
+      },
+      taskLabels: {
+        include: {
+          label: true
+        }
       }
     }
   });
@@ -129,6 +134,11 @@ export async function PATCH(
         orderBy: { createdAt: "asc" },
         include: {
           user: { select: { id: true, email: true, name: true } }
+        }
+      },
+      taskLabels: {
+        include: {
+          label: true
         }
       }
     }

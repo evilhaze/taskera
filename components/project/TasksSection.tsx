@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { CreateTaskForm } from "./CreateTaskForm";
 import { KanbanBoard } from "@/components/kanban/KanbanBoard";
+import { LabelBadge, type LabelShape } from "@/components/labels/LabelBadge";
 
 type Assignee = { id: string; email: string; name: string | null } | null;
 
@@ -16,6 +17,7 @@ type Task = {
   deadline: string | null;
   assignee: Assignee;
   createdAt: string;
+  taskLabels?: { label: LabelShape }[];
 };
 
 type Member = { id: string; email: string; name: string | null };
@@ -28,6 +30,8 @@ type Props = {
 export function TasksSection({ projectId, members }: Props) {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [labels, setLabels] = useState<LabelShape[]>([]);
+  const [selectedLabelId, setSelectedLabelId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -39,19 +43,38 @@ export function TasksSection({ projectId, members }: Props) {
     setTasks(Array.isArray(data) ? data : []);
   }, [projectId]);
 
+  const fetchLabels = useCallback(async () => {
+    const res = await fetch(`/api/projects/${projectId}/labels`);
+    if (!res.ok) return;
+    const data = await res.json();
+    setLabels(Array.isArray(data) ? data : []);
+  }, [projectId]);
+
   useEffect(() => {
     fetchTasks().finally(() => setLoading(false));
   }, [fetchTasks]);
 
   useEffect(() => {
+    fetchLabels();
+  }, [fetchLabels]);
+
+  useEffect(() => {
     const onCreated = () => {
       fetchTasks();
+      fetchLabels();
       router.refresh();
       setShowCreateForm(false);
     };
     window.addEventListener("task-created", onCreated);
     return () => window.removeEventListener("task-created", onCreated);
-  }, [fetchTasks, router]);
+  }, [fetchTasks, fetchLabels, router]);
+
+  const filteredTasks =
+    selectedLabelId == null
+      ? tasks
+      : tasks.filter((t) =>
+          t.taskLabels?.some((tl) => tl.label.id === selectedLabelId)
+        );
 
   async function handleDelete(taskId: string) {
     setDeletingId(taskId);
@@ -104,14 +127,50 @@ export function TasksSection({ projectId, members }: Props) {
           </p>
         </div>
       ) : (
-        <KanbanBoard
-          tasks={tasks}
-          projectId={projectId}
-          onTaskMoved={fetchTasks}
-          onDelete={handleDelete}
-          deletingId={deletingId}
-          onAddTaskInColumn={() => setShowCreateForm(true)}
-        />
+        <>
+          {labels.length > 0 && (
+            <div className="mb-4 flex flex-wrap items-center gap-2">
+              <span className="text-xs font-medium text-[var(--asana-text-secondary)]">
+                Метка:
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelectedLabelId(null)}
+                className={`rounded-md border px-2.5 py-1 text-xs font-medium transition-colors ${
+                  selectedLabelId === null
+                    ? "border-[var(--asana-blue)] bg-[var(--asana-blue)]/20 text-[var(--asana-text-primary)]"
+                    : "border-[var(--asana-border)] bg-transparent text-[var(--asana-text-secondary)] hover:bg-white/5"
+                }`}
+              >
+                Все
+              </button>
+              {labels.map((label) => (
+                <button
+                  key={label.id}
+                  type="button"
+                  onClick={() =>
+                    setSelectedLabelId((id) => (id === label.id ? null : label.id))
+                  }
+                  className={`rounded-md border px-2.5 py-1 text-xs font-medium transition-colors ${
+                    selectedLabelId === label.id
+                      ? "border-[var(--asana-blue)] bg-[var(--asana-blue)]/20 text-[var(--asana-text-primary)]"
+                      : "border-[var(--asana-border)] bg-transparent text-[var(--asana-text-secondary)] hover:bg-white/5"
+                  }`}
+                >
+                  <LabelBadge label={label} small />
+                </button>
+              ))}
+            </div>
+          )}
+          <KanbanBoard
+            tasks={filteredTasks}
+            projectId={projectId}
+            onTaskMoved={fetchTasks}
+            onDelete={handleDelete}
+            deletingId={deletingId}
+            onAddTaskInColumn={() => setShowCreateForm(true)}
+          />
+        </>
       )}
     </section>
   );

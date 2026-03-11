@@ -11,6 +11,7 @@ import {
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { TaskModal } from "@/components/tasks/TaskModal";
+import { LabelBadge, type LabelShape } from "@/components/labels/LabelBadge";
 
 type Assignee = { id: string; email: string; name: string | null } | null;
 
@@ -24,6 +25,7 @@ export type KanbanTask = {
   assignee: Assignee;
   createdAt: string;
   project?: { id: string; name: string };
+  taskLabels?: { label: LabelShape }[];
 };
 
 const STATUS_ORDER: readonly string[] = [
@@ -68,6 +70,7 @@ function TaskCard({
   showProjectInCard?: boolean;
 }) {
   const deadlineStr = formatDeadline(task.deadline);
+  const labels = task.taskLabels?.map((tl) => tl.label) ?? [];
   return (
     <div
       className={
@@ -83,8 +86,15 @@ function TaskCard({
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium leading-snug text-[var(--asana-text-primary)]">{task.title}</p>
-          {(showProjectInCard && task.project) || task.assignee || deadlineStr ? (
-            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[var(--asana-text-secondary)]">
+          {(labels.length > 0 || (showProjectInCard && task.project) || task.assignee || deadlineStr) ? (
+            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-xs text-[var(--asana-text-secondary)]">
+              {labels.length > 0 && (
+                <span className="flex flex-wrap gap-1">
+                  {labels.map((label) => (
+                    <LabelBadge key={label.id} label={label} small />
+                  ))}
+                </span>
+              )}
               {showProjectInCard && task.project && (
                 <span className="flex items-center gap-1">
                   <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--asana-green)]" />

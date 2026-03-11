@@ -24,7 +24,12 @@ export async function GET() {
     },
     include: {
       assignee: { select: { id: true, email: true, name: true } },
-      project: { select: { id: true, name: true } }
+      project: { select: { id: true, name: true } },
+      taskLabels: {
+        include: {
+          label: true
+        }
+      }
     },
     orderBy: [{ status: "asc" }, { order: "asc" }, { deadline: "asc" }, { createdAt: "desc" }]
   });

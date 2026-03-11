@@ -50,6 +50,7 @@ model Project {
   owner       User            @relation("ProjectsOwned", fields: [ownerId], references: [id])
   members     ProjectMember[]
   tasks       Task[]
+  labels      Label[]
 }
 
 model ProjectMember {
@@ -82,6 +83,7 @@ model Task {
   project     Project      @relation(fields: [projectId], references: [id])
   assignee    User?        @relation("TasksAssigned", fields: [assigneeId], references: [id])
   comments    Comment[]
+  taskLabels  TaskLabel[]
 
   @@index([projectId, status])
   @@index([deadline])
@@ -96,5 +98,26 @@ model Comment {
 
   task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id])
+}
+
+model Label {
+  id        String   @id @default(cuid())
+  name      String
+  color     String
+  projectId String
+  createdAt DateTime @default(now())
+
+  project    Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  taskLabels TaskLabel[]
+}
+
+model TaskLabel {
+  taskId  String
+  labelId String
+
+  task  Task  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  label Label @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, labelId])
 }
 

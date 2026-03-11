@@ -39,6 +39,23 @@
     --accent-hover: var(--asana-blue-dark);
     --accent-muted: rgba(73, 134, 255, 0.15);
     --accent-ring: rgba(73, 134, 255, 0.4);
+    /* Label colors — soft, premium (for badges) */
+    --label-gray-bg: rgba(160, 160, 160, 0.2);
+    --label-gray-text: #B8B8B8;
+    --label-blue-bg: rgba(0, 82, 204, 0.2);
+    --label-blue-text: #7BA3E8;
+    --label-green-bg: rgba(78, 201, 160, 0.2);
+    --label-green-text: #6DD4B4;
+    --label-yellow-bg: rgba(210, 170, 60, 0.25);
+    --label-yellow-text: #D4B85C;
+    --label-orange-bg: rgba(220, 140, 80, 0.25);
+    --label-orange-text: #E0A060;
+    --label-red-bg: rgba(240, 106, 106, 0.2);
+    --label-red-text: #E88A8A;
+    --label-purple-bg: rgba(160, 120, 200, 0.25);
+    --label-purple-text: #B89AD4;
+    --label-pink-bg: rgba(220, 140, 180, 0.25);
+    --label-pink-text: #D89AB8;
   }
 
   html {

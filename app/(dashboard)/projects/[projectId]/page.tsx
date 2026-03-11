@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { MembersSection } from "@/components/project/MembersSection";
 import { TasksSection } from "@/components/project/TasksSection";
 import { AnalyticsSection } from "@/components/project/AnalyticsSection";
+import { ManageLabelsSection } from "@/components/labels/ManageLabelsSection";
 
 type Props = { params: Promise<{ projectId: string }> };
 
@@ -91,6 +92,8 @@ export default async function ProjectPage({ params }: Props) {
           currentUserId={user.id}
           isOwner={isOwner}
         />
+
+        <ManageLabelsSection projectId={project.id} />
 
         <AnalyticsSection
           total={total}

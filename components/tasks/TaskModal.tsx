@@ -7,6 +7,7 @@ import {
   useCallback,
   FormEvent
 } from "react";
+import { LabelPicker } from "@/components/labels/LabelPicker";
 
 type User = { id: string; email: string; name: string | null };
 type Comment = {
@@ -15,6 +16,7 @@ type Comment = {
   createdAt: string;
   user: User;
 };
+type LabelShape = { id: string; name: string; color: string };
 type Task = {
   id: string;
   title: string;
@@ -29,6 +31,7 @@ type Task = {
   createdAt: string;
   updatedAt: string;
   comments?: Comment[];
+  taskLabels?: { label: LabelShape }[];
 };
 type Member = { id: string; email: string; name: string | null };
 
@@ -392,6 +395,28 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
                       <option key={o.value} value={o.value}>{o.label}</option>
                     ))}
                   </select>
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-[var(--asana-text-secondary)]">
+                    Метки
+                  </label>
+                  <LabelPicker
+                    projectId={task.projectId}
+                    taskId={task.id}
+                    selectedLabels={task.taskLabels?.map((tl) => tl.label) ?? []}
+                    onUpdate={(labels) => {
+                      setTask((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              taskLabels: labels.map((label) => ({ label }))
+                            }
+                          : null
+                      );
+                      onSaved?.();
+                    }}
+                    disabled={saving}
+                  />
                 </div>
               </div>
             </div>
