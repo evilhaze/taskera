@@ -9,6 +9,8 @@ import {
 } from "react";
 import { LabelPicker } from "@/components/labels/LabelPicker";
 import { UserAvatar } from "@/components/avatar/UserAvatar";
+import { ActivityFeed } from "@/components/activity/ActivityFeed";
+import type { ActivityItemType } from "@/components/activity/ActivityItem";
 
 type User = { id: string; email: string; name: string | null; avatarUrl?: string | null; avatarEmoji?: string | null };
 type Comment = {
@@ -88,6 +90,8 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
   const [editedDeadline, setEditedDeadline] = useState("");
   const [editedStatus, setEditedStatus] = useState("TODO");
 
+  const [taskActivities, setTaskActivities] = useState<ActivityItemType[]>([]);
+
   const overlayRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -148,6 +152,23 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
   }, [open, taskId, fetchTask]);
 
   useEffect(() => {
+    if (!open || !taskId) {
+      setTaskActivities([]);
+      return;
+    }
+    fetch(`/api/tasks/${taskId}/activity`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => setTaskActivities(Array.isArray(data) ? data : []));
+  }, [open, taskId]);
+
+  const refetchTaskActivity = useCallback(() => {
+    if (!taskId) return;
+    fetch(`/api/tasks/${taskId}/activity`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => setTaskActivities(Array.isArray(data) ? data : []));
+  }, [taskId]);
+
+  useEffect(() => {
     function handleKeyDown(e: globalThis.KeyboardEvent) {
       if (e.key === "Escape") onClose();
     }
@@ -189,6 +210,7 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
         return;
       }
       setTask(data);
+      refetchTaskActivity();
       onSaved?.();
     } finally {
       setSaving(false);
@@ -213,6 +235,7 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
           comments: [...(task.comments ?? []), data]
         });
         setCommentText("");
+        refetchTaskActivity();
       }
     } finally {
       setCommentSending(false);
@@ -334,15 +357,14 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
                     {task.updatedAt !== task.createdAt && (
                       <li>Обновлено {formatDate(task.updatedAt)}</li>
                     )}
-                    {(task.comments ?? []).map((c) => (
-                      <li key={c.id} className="flex items-center gap-2">
-                        <UserAvatar user={c.user} size="xs" />
-                        <span>
-                          {c.user.name || c.user.email} оставил комментарий · {formatDate(c.createdAt)}
-                        </span>
-                      </li>
-                    ))}
                   </ul>
+                  <div className="mt-3">
+                    <ActivityFeed
+                      activities={taskActivities}
+                      emptyMessage="Нет записей по этой задаче"
+                      compact
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -435,6 +457,7 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
                             }
                           : null
                       );
+                      refetchTaskActivity();
                       onSaved?.();
                     }}
                     disabled={saving}

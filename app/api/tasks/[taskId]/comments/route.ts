@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { createActivity, formatActivityMessage } from "@/lib/activity";
 
 const addCommentSchema = z.object({
   content: z.string().min(1, "Комментарий не может быть пустым").max(5000)
@@ -10,7 +11,7 @@ const addCommentSchema = z.object({
 async function ensureTaskAccess(userId: string, taskId: string) {
   const task = await prisma.task.findUnique({
     where: { id: taskId },
-    select: { id: true, projectId: true }
+    select: { id: true, projectId: true, title: true }
   });
   if (!task) return null;
 
@@ -87,6 +88,18 @@ export async function POST(
     include: {
       user: { select: { id: true, email: true, name: true } }
     }
+  });
+
+  const message = formatActivityMessage("COMMENT_ADDED", user.name ?? user.email, {
+    taskTitle: task.title
+  });
+  await createActivity({
+    userId: user.id,
+    projectId: task.projectId,
+    type: "COMMENT_ADDED",
+    message,
+    taskId,
+    metadata: { taskTitle: task.title }
   });
 
   return NextResponse.json(comment, { status: 201 });

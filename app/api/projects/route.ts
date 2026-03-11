@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createProjectSchema } from "@/lib/validations/project";
+import { createActivity, formatActivityMessage } from "@/lib/activity";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -111,6 +112,16 @@ export async function POST(req: NextRequest) {
       _count: { select: { members: true, tasks: true } }
     }
   });
+
+  if (created) {
+    const message = formatActivityMessage("PROJECT_CREATED", user.name ?? user.email);
+    await createActivity({
+      userId: user.id,
+      projectId: project.id,
+      type: "PROJECT_CREATED",
+      message
+    });
+  }
 
   return NextResponse.json(created, { status: 201 });
 }

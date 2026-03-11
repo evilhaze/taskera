@@ -7,6 +7,7 @@ import { TasksSection } from "@/components/project/TasksSection";
 import { AnalyticsSection } from "@/components/project/AnalyticsSection";
 import { ManageLabelsSection } from "@/components/labels/ManageLabelsSection";
 import { ProjectSummarySection } from "@/components/project/ProjectSummarySection";
+import { RecentActivitySection } from "@/components/activity/RecentActivitySection";
 
 type Props = { params: Promise<{ projectId: string }> };
 
@@ -91,6 +92,8 @@ export default async function ProjectPage({ params }: Props) {
         />
 
         <ManageLabelsSection projectId={project.id} />
+
+        <RecentActivitySection projectId={project.id} />
 
         <AnalyticsSection
           total={total}

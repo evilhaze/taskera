@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { addMemberSchema, removeMemberSchema } from "@/lib/validations/project";
+import { createActivity, formatActivityMessage } from "@/lib/activity";
 
 export async function POST(
   req: NextRequest,
@@ -77,6 +78,16 @@ export async function POST(
     }
     throw e;
   }
+
+  const message = formatActivityMessage("MEMBER_ADDED", user.name ?? user.email, {
+    memberEmail: invitedUser.email
+  });
+  await createActivity({
+    userId: user.id,
+    projectId,
+    type: "MEMBER_ADDED",
+    message
+  });
 
   return NextResponse.json(
     {

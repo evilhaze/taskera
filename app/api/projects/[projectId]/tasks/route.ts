@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createTaskSchema } from "@/lib/validations/task";
+import { createActivity, formatActivityMessage } from "@/lib/activity";
 
 async function ensureProjectAccess(userId: string, projectId: string) {
   const membership = await prisma.projectMember.findUnique({
@@ -105,6 +106,17 @@ export async function POST(
     include: {
       assignee: { select: { id: true, email: true, name: true } }
     }
+  });
+
+  const message = formatActivityMessage("TASK_CREATED", user.name ?? user.email, {
+    taskTitle: task.title
+  });
+  await createActivity({
+    userId: user.id,
+    projectId,
+    type: "TASK_CREATED",
+    message,
+    taskId: task.id
   });
 
   return NextResponse.json(task, { status: 201 });

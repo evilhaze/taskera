@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { updateTaskSchema } from "@/lib/validations/task";
+import { createActivity, formatActivityMessage } from "@/lib/activity";
 
 async function ensureTaskAccess(userId: string, taskId: string) {
   const task = await prisma.task.findUnique({
@@ -143,6 +144,104 @@ export async function PATCH(
       }
     }
   });
+
+  const userName = user.name ?? user.email;
+  const taskTitle = updated.title;
+
+  if (updatePayload.title !== undefined && task.title !== updatePayload.title) {
+    const message = formatActivityMessage("TASK_UPDATED", userName, {
+      taskTitle,
+      oldValue: "название",
+      newValue: updatePayload.title
+    });
+    await createActivity({
+      userId: user.id,
+      projectId: task.projectId,
+      type: "TASK_UPDATED",
+      message,
+      taskId,
+      metadata: { taskTitle, oldValue: task.title, newValue: updatePayload.title }
+    });
+  }
+  if (updatePayload.description !== undefined && task.description !== updatePayload.description) {
+    const message = formatActivityMessage("TASK_UPDATED", userName, { taskTitle });
+    await createActivity({
+      userId: user.id,
+      projectId: task.projectId,
+      type: "TASK_UPDATED",
+      message: `${userName} изменил описание задачи «${taskTitle}»`,
+      taskId
+    });
+  }
+  if (updatePayload.status !== undefined && task.status !== updatePayload.status) {
+    const message = formatActivityMessage("TASK_STATUS_CHANGED", userName, {
+      taskTitle,
+      newValue: updatePayload.status
+    });
+    await createActivity({
+      userId: user.id,
+      projectId: task.projectId,
+      type: "TASK_STATUS_CHANGED",
+      message,
+      taskId,
+      metadata: { taskTitle, oldValue: task.status, newValue: updatePayload.status }
+    });
+  }
+  if (
+    updatePayload.assigneeId !== undefined &&
+    (task.assigneeId ?? null) !== (updatePayload.assigneeId ?? null)
+  ) {
+    const assigneeEmail = updated.assignee?.email ?? null;
+    const message = assigneeEmail
+      ? formatActivityMessage("TASK_ASSIGNEE_CHANGED", userName, {
+          taskTitle,
+          assigneeEmail
+        })
+      : `${userName} снял исполнителя с задачи «${taskTitle}»`;
+    await createActivity({
+      userId: user.id,
+      projectId: task.projectId,
+      type: "TASK_ASSIGNEE_CHANGED",
+      message,
+      taskId,
+      metadata: { taskTitle, assigneeEmail }
+    });
+  }
+  if (updatePayload.priority !== undefined && task.priority !== updatePayload.priority) {
+    const message = formatActivityMessage("TASK_PRIORITY_CHANGED", userName, {
+      taskTitle,
+      newValue: updatePayload.priority
+    });
+    await createActivity({
+      userId: user.id,
+      projectId: task.projectId,
+      type: "TASK_PRIORITY_CHANGED",
+      message,
+      taskId,
+      metadata: { taskTitle, oldValue: task.priority, newValue: updatePayload.priority }
+    });
+  }
+  if (
+    updatePayload.deadline !== undefined &&
+    (task.deadline?.toISOString() ?? null) !==
+      (updatePayload.deadline?.toISOString() ?? null)
+  ) {
+    const deadlineStr = updatePayload.deadline
+      ? updatePayload.deadline.toLocaleString("ru-RU")
+      : "не указан";
+    const message = formatActivityMessage("TASK_DEADLINE_CHANGED", userName, {
+      taskTitle,
+      newValue: deadlineStr
+    });
+    await createActivity({
+      userId: user.id,
+      projectId: task.projectId,
+      type: "TASK_DEADLINE_CHANGED",
+      message,
+      taskId,
+      metadata: { taskTitle, newValue: deadlineStr }
+    });
+  }
 
   return NextResponse.json(updated);
 }

@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { taskLabelsSchema } from "@/lib/validations/label";
+import { createActivity, formatActivityMessage } from "@/lib/activity";
 
 async function ensureTaskAccess(userId: string, taskId: string) {
   const task = await prisma.task.findUnique({
     where: { id: taskId },
-    select: { id: true, projectId: true }
+    select: { id: true, projectId: true, title: true }
   });
   if (!task) return null;
 
@@ -71,6 +72,24 @@ export async function PATCH(
   const labels = await prisma.label.findMany({
     where: { taskLabels: { some: { taskId } } },
     orderBy: { name: "asc" }
+  });
+
+  const message =
+    labels.length > 0
+      ? formatActivityMessage("LABEL_ADDED", user.name ?? user.email, {
+          taskTitle: task.title,
+          labelName: labels.map((l) => l.name).join(", ")
+        })
+      : formatActivityMessage("LABEL_REMOVED", user.name ?? user.email, {
+          taskTitle: task.title
+        });
+  await createActivity({
+    userId: user.id,
+    projectId: task.projectId,
+    type: labels.length > 0 ? "LABEL_ADDED" : "LABEL_REMOVED",
+    message,
+    taskId,
+    metadata: { taskTitle: task.title, labelNames: labels.map((l) => l.name) }
   });
 
   return NextResponse.json({ labelIds: labels.map((l) => l.id), labels });
