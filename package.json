@@ -11,6 +11,8 @@
     "prisma:migrate": "prisma migrate dev"
   },
   "dependencies": {
+    "@dnd-kit/core": "latest",
+    "@dnd-kit/utilities": "latest",
     "@prisma/client": "^6.11.1",
     "autoprefixer": "latest",
     "bcryptjs": "latest",

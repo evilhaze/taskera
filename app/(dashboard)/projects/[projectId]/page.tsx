@@ -38,7 +38,7 @@ export default async function ProjectPage({ params }: Props) {
 
   return (
     <div className="min-h-screen p-6 md:p-8">
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto max-w-6xl">
         <header className="mb-6">
           <Link
             href="/"
@@ -72,13 +72,6 @@ export default async function ProjectPage({ params }: Props) {
             name: m.user.name
           }))}
         />
-
-        <section className="rounded-lg border border-slate-700 bg-slate-900/50 p-4 text-slate-400 text-center">
-          <p>Канбан-доска будет добавлена следующим шагом.</p>
-          <Link href={`/projects/${project.id}`} className="text-sky-400 hover:underline mt-2 inline-block">
-            Обновить
-          </Link>
-        </section>
       </div>
     </div>
   );
