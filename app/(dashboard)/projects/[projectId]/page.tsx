@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { MembersSection } from "@/components/project/MembersSection";
+import { TasksSection } from "@/components/project/TasksSection";
 
 type Props = { params: Promise<{ projectId: string }> };
 
@@ -63,8 +64,17 @@ export default async function ProjectPage({ params }: Props) {
           isOwner={isOwner}
         />
 
+        <TasksSection
+          projectId={project.id}
+          members={project.members.map((m) => ({
+            id: m.user.id,
+            email: m.user.email,
+            name: m.user.name
+          }))}
+        />
+
         <section className="rounded-lg border border-slate-700 bg-slate-900/50 p-4 text-slate-400 text-center">
-          <p>Канбан-доска и задачи будут на этой странице в следующем шаге.</p>
+          <p>Канбан-доска будет добавлена следующим шагом.</p>
           <Link href={`/projects/${project.id}`} className="text-sky-400 hover:underline mt-2 inline-block">
             Обновить
           </Link>

@@ -171,6 +171,7 @@ export async function DELETE(
         { message: "Нельзя удалить владельца проекта" },
         { status: 400 }
       );
+    }
   }
 
   await prisma.projectMember.delete({
