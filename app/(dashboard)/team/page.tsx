@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Users } from "lucide-react";
 import { UserAvatar } from "@/components/avatar/UserAvatar";
 import { ProgressBar } from "@/components/ui/ProgressBar";
@@ -25,7 +26,10 @@ function TeamMemberCard({ member }: { member: TeamMember }) {
 
   return (
     <div className="rounded-xl border border-[var(--asana-border-subtle)] bg-[var(--asana-bg-card)] p-5 transition-colors hover:border-[var(--asana-border)]">
-      <div className="flex items-start gap-4">
+      <Link
+        href={`/team/${member.id}`}
+        className="flex items-start gap-4 outline-none focus-visible:ring-2 focus-visible:ring-[var(--asana-border)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--asana-bg-card)] rounded-xl"
+      >
         <UserAvatar
           user={{
             id: member.id,
@@ -38,7 +42,7 @@ function TeamMemberCard({ member }: { member: TeamMember }) {
           className="shrink-0"
         />
         <div className="min-w-0 flex-1">
-          <h3 className="font-semibold text-[var(--asana-text-primary)] truncate">
+          <h3 className="font-semibold text-[var(--asana-text-primary)] truncate hover:underline">
             {member.name ?? member.email}
           </h3>
           <p className="mt-0.5 truncate text-sm text-[var(--asana-text-placeholder)]">
@@ -83,7 +87,7 @@ function TeamMemberCard({ member }: { member: TeamMember }) {
             </div>
           )}
         </div>
-      </div>
+      </Link>
     </div>
   );
 }

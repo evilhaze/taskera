@@ -9,8 +9,15 @@ type User = {
   id: string;
   email: string;
   name: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  nickname: string | null;
+  birthDate: string | null;
+  position: string | null;
+  bio: string | null;
   avatarUrl: string | null;
   avatarEmoji: string | null;
+  createdAt?: string;
 };
 
 export function ProfileSettingsClient() {
@@ -20,6 +27,12 @@ export function ProfileSettingsClient() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [birthDate, setBirthDate] = useState("");
+  const [position, setPosition] = useState("");
+  const [bio, setBio] = useState("");
   const [avatarEmoji, setAvatarEmoji] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,6 +42,12 @@ export function ProfileSettingsClient() {
         if (data) {
           setUser(data);
           setName(data.name ?? "");
+          setFirstName(data.firstName ?? "");
+          setLastName(data.lastName ?? "");
+          setNickname(data.nickname ?? "");
+          setBirthDate(data.birthDate ?? "");
+          setPosition(data.position ?? "");
+          setBio(data.bio ?? "");
           setAvatarEmoji(data.avatarEmoji ?? null);
         }
       })
@@ -47,6 +66,12 @@ export function ProfileSettingsClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim() || null,
+          firstName: firstName.trim() || null,
+          lastName: lastName.trim() || null,
+          nickname: nickname.trim() || null,
+          birthDate: birthDate.trim() ? birthDate : null,
+          position: position.trim() || null,
+          bio: bio.trim() || null,
           avatarEmoji: avatarEmoji || null
         })
       });
@@ -56,6 +81,14 @@ export function ProfileSettingsClient() {
         return;
       }
       setUser(data);
+      setName(data.name ?? "");
+      setFirstName(data.firstName ?? "");
+      setLastName(data.lastName ?? "");
+      setNickname(data.nickname ?? "");
+      setBirthDate(data.birthDate ?? "");
+      setPosition(data.position ?? "");
+      setBio(data.bio ?? "");
+      setAvatarEmoji(data.avatarEmoji ?? null);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } finally {
@@ -96,37 +129,115 @@ export function ProfileSettingsClient() {
 
       <div className="card p-6">
         <div className="mb-6 flex items-center gap-4">
-          <UserAvatar user={user} size="lg" />
+          <UserAvatar
+            user={{
+              ...user,
+              name: [user.firstName, user.lastName].filter(Boolean).join(" ") || user.name
+            }}
+            size="lg"
+          />
           <div>
             <p className="font-medium text-[var(--asana-text-primary)]">{user.email}</p>
-            {user.name && (
-              <p className="text-sm text-[var(--asana-text-secondary)]">{user.name}</p>
+            {(user.firstName || user.lastName || user.name) && (
+              <p className="text-sm text-[var(--asana-text-secondary)]">
+                {[user.firstName, user.lastName].filter(Boolean).join(" ") || user.name}
+                {user.nickname && ` (@${user.nickname})`}
+              </p>
             )}
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-[var(--asana-text-secondary)]">
-              Имя
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Как к вам обращаться"
-              maxLength={200}
-              className="input-base"
-            />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
+            <h2 className="text-sm font-semibold text-[var(--asana-text-primary)]">Основное</h2>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-[var(--asana-text-secondary)]">
+                Имя (отображаемое)
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Как к вам обращаться"
+                maxLength={200}
+                className="input-base"
+              />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-[var(--asana-text-secondary)]">Имя</label>
+                <input
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Имя"
+                  maxLength={100}
+                  className="input-base"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-[var(--asana-text-secondary)]">Фамилия</label>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Фамилия"
+                  maxLength={100}
+                  className="input-base"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-[var(--asana-text-secondary)]">Никнейм</label>
+              <input
+                type="text"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder="nickname"
+                maxLength={100}
+                className="input-base"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-[var(--asana-text-secondary)]">Должность</label>
+              <input
+                type="text"
+                value={position}
+                onChange={(e) => setPosition(e.target.value)}
+                placeholder="Например: Разработчик"
+                maxLength={200}
+                className="input-base"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-[var(--asana-text-secondary)]">Дата рождения</label>
+              <input
+                type="date"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                className="input-base"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-[var(--asana-text-secondary)]">О себе</label>
+              <textarea
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="Кратко о себе"
+                maxLength={2000}
+                rows={3}
+                className="input-base resize-none"
+              />
+            </div>
           </div>
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-[var(--asana-text-secondary)]">
-              Аватар
-            </label>
-            <p className="mb-2 text-xs text-[var(--asana-text-placeholder)]">
-              Выберите эмодзи-аватар
-            </p>
-            <div className="flex flex-wrap gap-2">
+
+          <div className="space-y-4 border-t border-[var(--asana-border-subtle)] pt-6">
+            <h2 className="text-sm font-semibold text-[var(--asana-text-primary)]">Аватар (эмодзи)</h2>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-[var(--asana-text-secondary)]">
+                Выберите эмодзи-аватар
+              </label>
+              <div className="flex flex-wrap gap-2">
               {AVATAR_EMOJI_OPTIONS.map((emoji) => (
                 <button
                   key={emoji}
@@ -149,6 +260,7 @@ export function ProfileSettingsClient() {
               </p>
             )}
           </div>
+        </div>
           {error && (
             <p className="text-sm text-[var(--asana-red)]">{error}</p>
           )}

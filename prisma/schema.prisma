@@ -30,6 +30,12 @@ model User {
   email         String          @unique
   passwordHash  String
   name          String?
+  firstName     String?
+  lastName      String?
+  nickname      String?
+  birthDate     DateTime?
+  position      String?
+  bio           String?
   avatarUrl     String?
   avatarEmoji   String?
   createdAt     DateTime        @default(now())

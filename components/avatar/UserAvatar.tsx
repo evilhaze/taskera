@@ -14,14 +14,16 @@ const SIZE_CLASSES = {
   xs: "h-6 w-6 text-[10px]",
   sm: "h-8 w-8 text-xs",
   md: "h-9 w-9 text-sm",
-  lg: "h-10 w-10 text-sm"
+  lg: "h-10 w-10 text-sm",
+  xl: "h-20 w-20 text-xl sm:h-24 sm:w-24"
 } as const;
 
 const EMOJI_SIZE_CLASSES = {
   xs: "text-sm",
   sm: "text-base",
   md: "text-lg",
-  lg: "text-xl"
+  lg: "text-xl",
+  xl: "text-2xl"
 } as const;
 
 type Size = keyof typeof SIZE_CLASSES;
