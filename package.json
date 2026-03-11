@@ -17,6 +17,7 @@
     "autoprefixer": "latest",
     "bcryptjs": "latest",
     "jsonwebtoken": "latest",
+    "lucide-react": "^0.577.0",
     "next": "latest",
     "postcss": "latest",
     "prisma": "^6.11.1",
