@@ -10,6 +10,7 @@ import {
 import { getCurrentUser } from "@/lib/auth";
 import { getDashboardAnalytics } from "@/lib/dashboard";
 import { CreateProjectForm } from "@/components/dashboard/CreateProjectForm";
+import { ScrollToCreateProject } from "@/components/dashboard/ScrollToCreateProject";
 import { AnalyticsCard } from "@/components/dashboard/AnalyticsCard";
 import { ProjectOverviewCard } from "@/components/dashboard/ProjectOverviewCard";
 import { StatusBreakdown } from "@/components/dashboard/StatusBreakdown";
@@ -104,7 +105,8 @@ export default async function DashboardPage() {
       </section>
 
       {/* Create project + Project overview */}
-      <div className="space-y-10">
+      <ScrollToCreateProject />
+      <div className="space-y-10" id="create-project">
         <CreateProjectForm />
         <section>
           <h2 className="section-title mb-4">Мои проекты</h2>

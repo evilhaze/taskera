@@ -11,16 +11,26 @@ export function AppTopbar({ user }: Props) {
     <header className="sticky top-0 z-20 flex h-12 items-center justify-between border-b border-[var(--asana-border-subtle)] bg-[var(--asana-bg-app)] px-4">
       <div className="flex items-center gap-3">
         <Link
-          href="/"
-          className="btn-create inline-flex items-center gap-1.5 text-sm"
+          href="/?create=project"
+          className="btn-create inline-flex items-center gap-1.5 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--asana-border)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--asana-bg-app)]"
         >
           <span aria-hidden>+</span>
           Создать
         </Link>
         <div className="h-6 w-px bg-[var(--asana-border-subtle)]" />
-        <div className="flex h-9 w-64 items-center rounded-md border border-[var(--asana-border)] bg-[var(--asana-bg-input)] px-3 text-sm text-[var(--asana-text-placeholder)]">
-          Поиск
-        </div>
+        <form action="/search" method="GET" className="flex-1 max-w-xs">
+          <label htmlFor="global-search" className="sr-only">
+            Поиск проектов, задач и участников
+          </label>
+          <input
+            id="global-search"
+            name="q"
+            type="search"
+            placeholder="Поиск проектов, задач и участников..."
+            className="h-9 w-64 rounded-md border border-[var(--asana-border)] bg-[var(--asana-bg-input)] px-3 text-sm text-[var(--asana-text-primary)] placeholder:text-[var(--asana-text-placeholder)] focus:outline-none focus:ring-2 focus:ring-[var(--asana-border)] focus:ring-offset-1 focus:ring-offset-[var(--asana-bg-app)]"
+            autoComplete="off"
+          />
+        </form>
       </div>
 
       <div className="flex items-center gap-2">

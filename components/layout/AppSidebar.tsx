@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Users, Activity, Calendar, Home, CheckSquare, Bell } from "lucide-react";
+import { CalendarDays, Users, Activity, Calendar, Home, CheckSquare, Bell, Plus } from "lucide-react";
 import { SidebarSection } from "./SidebarSection";
 import { SidebarBadge } from "./SidebarBadge";
 
@@ -124,13 +124,21 @@ export function AppSidebar() {
         </SidebarSection>
 
         <SidebarSection title="Projects" defaultOpen={true}>
-          {projects.length === 0 ? (
-            <div className="px-2.5 py-1.5 text-sm text-[var(--asana-text-placeholder)]">
-              Нет проектов
-            </div>
-          ) : (
-            <ul className="space-y-0.5">
-              {projects.map((p) => {
+          <div className="flex flex-col gap-0.5">
+            <Link
+              href="/?create=project"
+              className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium text-[var(--asana-text-secondary)] transition-colors hover:bg-white/5 hover:text-[var(--asana-text-primary)]"
+            >
+              <Plus className="h-4 w-4 shrink-0" aria-hidden />
+              <span>Create project</span>
+            </Link>
+            {projects.length === 0 ? (
+              <div className="px-2.5 py-1.5 text-sm text-[var(--asana-text-placeholder)]">
+                Нет проектов
+              </div>
+            ) : (
+              <ul className="space-y-0.5">
+                {projects.map((p) => {
                 const isActive = projectId === p.id;
                 return (
                   <li key={p.id}>
@@ -163,7 +171,8 @@ export function AppSidebar() {
                 );
               })}
             </ul>
-          )}
+            )}
+          </div>
         </SidebarSection>
       </div>
     </aside>
