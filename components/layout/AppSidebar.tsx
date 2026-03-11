@@ -20,6 +20,8 @@ export function AppSidebar() {
   }, []);
 
   const isHome = pathname === "/";
+  const isMyTasks = pathname === "/my-tasks";
+  const isNotifications = pathname === "/notifications";
   const projectId = pathname.startsWith("/projects/") ? pathname.split("/")[2] : null;
 
   return (
@@ -38,6 +40,30 @@ export function AppSidebar() {
         >
           <span className="text-[var(--asana-text-secondary)]">⌂</span>
           Главная
+        </Link>
+
+        <Link
+          href="/my-tasks"
+          className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors ${
+            isMyTasks
+              ? "bg-white/10 text-[var(--asana-text-primary)]"
+              : "text-[var(--asana-text-secondary)] hover:bg-white/5 hover:text-[var(--asana-text-primary)]"
+          }`}
+        >
+          <span className="text-[var(--asana-text-secondary)]" aria-hidden>✓</span>
+          Мои задачи
+        </Link>
+
+        <Link
+          href="/notifications"
+          className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors ${
+            isNotifications
+              ? "bg-white/10 text-[var(--asana-text-primary)]"
+              : "text-[var(--asana-text-secondary)] hover:bg-white/5 hover:text-[var(--asana-text-primary)]"
+          }`}
+        >
+          <span className="text-[var(--asana-text-secondary)]">🔔</span>
+          Уведомления
         </Link>
 
         <div className="mt-3 px-2.5 pb-1 pt-2">

@@ -30,6 +30,7 @@ export function TasksSection({ projectId, members }: Props) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   const fetchTasks = useCallback(async () => {
     const res = await fetch(`/api/projects/${projectId}/tasks`);
@@ -46,6 +47,7 @@ export function TasksSection({ projectId, members }: Props) {
     const onCreated = () => {
       fetchTasks();
       router.refresh();
+      setShowCreateForm(false);
     };
     window.addEventListener("task-created", onCreated);
     return () => window.removeEventListener("task-created", onCreated);
@@ -66,11 +68,26 @@ export function TasksSection({ projectId, members }: Props) {
 
   return (
     <section>
-      <h2 className="section-title mb-4">Задачи</h2>
-
-      <div className="mb-6">
-        <CreateTaskForm projectId={projectId} members={members} />
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+        <h2 className="section-title mb-0">Задачи</h2>
+        <button
+          type="button"
+          onClick={() => setShowCreateForm((v) => !v)}
+          className="btn-primary inline-flex items-center gap-2"
+        >
+          <span aria-hidden>+</span>
+          Добавить задачу
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
       </div>
+
+      {showCreateForm && (
+        <div className="mb-6">
+          <CreateTaskForm projectId={projectId} members={members} />
+        </div>
+      )}
 
       {loading ? (
         <div className="card flex items-center justify-center py-16">
@@ -83,7 +100,7 @@ export function TasksSection({ projectId, members }: Props) {
         <div className="card flex flex-col items-center justify-center py-16 text-center">
           <p className="text-[var(--asana-text-secondary)]">Задач пока нет.</p>
           <p className="mt-1 text-sm text-[var(--asana-text-placeholder)]">
-            Создайте первую задачу выше.
+            Нажмите «Добавить задачу» или кнопку в колонке.
           </p>
         </div>
       ) : (
@@ -93,6 +110,7 @@ export function TasksSection({ projectId, members }: Props) {
           onTaskMoved={fetchTasks}
           onDelete={handleDelete}
           deletingId={deletingId}
+          onAddTaskInColumn={() => setShowCreateForm(true)}
         />
       )}
     </section>

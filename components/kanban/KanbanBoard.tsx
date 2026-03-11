@@ -22,6 +22,7 @@ export type KanbanTask = {
   deadline: string | null;
   assignee: Assignee;
   createdAt: string;
+  project?: { id: string; name: string };
 };
 
 const STATUS_ORDER: readonly string[] = [
@@ -58,10 +59,12 @@ function formatDeadline(iso: string | null) {
 
 function TaskCard({
   task,
-  isOverlay
+  isOverlay,
+  showProjectInCard = false
 }: {
   task: KanbanTask;
   isOverlay?: boolean;
+  showProjectInCard?: boolean;
 }) {
   const deadlineStr = formatDeadline(task.deadline);
   return (
@@ -73,30 +76,40 @@ function TaskCard({
           : "border-[var(--asana-border)] hover:bg-[var(--asana-bg-card-hover)] hover:border-[#4A4A62] hover:shadow-[0_4px_12px_rgba(0,0,0,0.4)]")
       }
     >
-      <p className="text-sm font-medium text-[var(--asana-text-primary)]">{task.title}</p>
-      {task.description && (
-        <p className="mt-1 line-clamp-2 text-xs text-[var(--asana-text-secondary)]">
-          {task.description}
-        </p>
-      )}
-      <div className="mt-2.5 flex flex-wrap gap-2 text-xs text-[var(--asana-text-secondary)]">
-        {task.assignee && (
-          <span title={task.assignee.email} className="max-w-[120px] truncate">
-            {task.assignee.email}
-          </span>
-        )}
-        {deadlineStr && <span>{deadlineStr}</span>}
-        <span
-          className={
-            task.priority === "HIGH"
-              ? "font-medium text-[#FF7070]"
-              : task.priority === "LOW"
-                ? "text-[var(--asana-text-placeholder)]"
-                : ""
-          }
-        >
-          {PRIORITY_LABELS[task.priority] ?? task.priority}
+      <div className="flex items-start gap-2">
+        <span className="mt-0.5 shrink-0 text-[var(--asana-text-placeholder)]" aria-hidden>
+          ☐
         </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium leading-snug text-[var(--asana-text-primary)]">{task.title}</p>
+          {(showProjectInCard && task.project) || task.assignee || deadlineStr ? (
+            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[var(--asana-text-secondary)]">
+              {showProjectInCard && task.project && (
+                <span className="flex items-center gap-1">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--asana-green)]" />
+                  <span className="truncate max-w-[140px]" title={task.project.name}>{task.project.name}</span>
+                </span>
+              )}
+              {task.assignee && (
+                <span title={task.assignee.email} className="max-w-[100px] truncate">
+                  {task.assignee.email}
+                </span>
+              )}
+              {deadlineStr && <span>{deadlineStr}</span>}
+              <span
+                className={
+                  task.priority === "HIGH"
+                    ? "font-medium text-[#FF7070]"
+                    : task.priority === "LOW"
+                      ? "text-[var(--asana-text-placeholder)]"
+                      : ""
+                }
+              >
+                {PRIORITY_LABELS[task.priority] ?? task.priority}
+              </span>
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );
@@ -105,11 +118,13 @@ function TaskCard({
 function DraggableCard({
   task,
   onDelete,
-  deletingId
+  deletingId,
+  showProjectInCard = false
 }: {
   task: KanbanTask;
   onDelete: (id: string) => void;
   deletingId: string | null;
+  showProjectInCard?: boolean;
 }) {
   const {
     attributes,
@@ -140,7 +155,7 @@ function DraggableCard({
       }
     >
       <div className="relative group">
-        <TaskCard task={task} />
+        <TaskCard task={task} showProjectInCard={showProjectInCard} />
         <button
           type="button"
           onClick={(e) => {
@@ -162,13 +177,17 @@ function DroppableColumn({
   label,
   tasks,
   onDelete,
-  deletingId
+  deletingId,
+  onAddTaskInColumn,
+  showProjectInCard
 }: {
   status: string;
   label: string;
   tasks: KanbanTask[];
   onDelete: (id: string) => void;
   deletingId: string | null;
+  onAddTaskInColumn?: () => void;
+  showProjectInCard?: boolean;
 }) {
   const { setNodeRef, isOver } = useDroppable({ id: status });
 
@@ -193,8 +212,19 @@ function DroppableColumn({
             task={task}
             onDelete={onDelete}
             deletingId={deletingId}
+            showProjectInCard={showProjectInCard}
           />
         ))}
+        {onAddTaskInColumn && (
+          <button
+            type="button"
+            onClick={onAddTaskInColumn}
+            className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-[var(--asana-text-secondary)] hover:bg-white/5 hover:text-[var(--asana-text-primary)] transition-colors"
+          >
+            <span aria-hidden>+</span>
+            Добавить задачу
+          </button>
+        )}
       </div>
     </div>
   );
@@ -206,6 +236,8 @@ type Props = {
   onTaskMoved: () => void;
   onDelete: (taskId: string) => Promise<void>;
   deletingId: string | null;
+  onAddTaskInColumn?: () => void;
+  showProjectInCard?: boolean;
 };
 
 export function KanbanBoard({
@@ -213,7 +245,9 @@ export function KanbanBoard({
   projectId,
   onTaskMoved,
   onDelete,
-  deletingId
+  deletingId,
+  onAddTaskInColumn,
+  showProjectInCard = false
 }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -266,12 +300,14 @@ export function KanbanBoard({
             tasks={byStatus[status] ?? []}
             onDelete={(id) => onDelete(id)}
             deletingId={deletingId}
+            onAddTaskInColumn={onAddTaskInColumn}
+            showProjectInCard={showProjectInCard}
           />
         ))}
       </div>
 
       <DragOverlay>
-        {activeTask ? <TaskCard task={activeTask} isOverlay /> : null}
+        {activeTask ? <TaskCard task={activeTask} isOverlay showProjectInCard={showProjectInCard} /> : null}
       </DragOverlay>
     </DndContext>
   );

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NotificationDropdown } from "./NotificationDropdown";
 
 type Props = {
   user: { email: string; name: string | null } | null;
@@ -26,6 +27,7 @@ export function AppTopbar({ user }: Props) {
       </div>
 
       <div className="flex items-center gap-2">
+        <NotificationDropdown />
         <form action="/api/auth/logout" method="POST" className="inline">
           <button
             type="submit"
