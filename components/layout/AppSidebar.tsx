@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { CalendarDays, Users } from "lucide-react";
 
 type Project = {
   id: string;
@@ -32,7 +33,9 @@ export function AppSidebar() {
 
   const isHome = pathname === "/";
   const isMyTasks = pathname === "/my-tasks";
+  const isToday = pathname === "/today";
   const isNotifications = pathname === "/notifications";
+  const isTeam = pathname === "/team";
   const projectId = pathname.startsWith("/projects/") ? pathname.split("/")[2] : null;
 
   return (
@@ -66,6 +69,18 @@ export function AppSidebar() {
         </Link>
 
         <Link
+          href="/today"
+          className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors ${
+            isToday
+              ? "bg-white/10 text-[var(--asana-text-primary)]"
+              : "text-[var(--asana-text-secondary)] hover:bg-white/5 hover:text-[var(--asana-text-primary)]"
+          }`}
+        >
+          <CalendarDays className="h-4 w-4 shrink-0 text-[var(--asana-text-secondary)]" aria-hidden />
+          Сегодня
+        </Link>
+
+        <Link
           href="/notifications"
           className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors ${
             isNotifications
@@ -75,6 +90,18 @@ export function AppSidebar() {
         >
           <span className="text-[var(--asana-text-secondary)]">🔔</span>
           Уведомления
+        </Link>
+
+        <Link
+          href="/team"
+          className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium transition-colors ${
+            isTeam
+              ? "bg-white/10 text-[var(--asana-text-primary)]"
+              : "text-[var(--asana-text-secondary)] hover:bg-white/5 hover:text-[var(--asana-text-primary)]"
+          }`}
+        >
+          <Users className="h-4 w-4 shrink-0 text-[var(--asana-text-secondary)]" aria-hidden />
+          Команда
         </Link>
 
         <div className="mt-3 px-2.5 pb-1 pt-2">
