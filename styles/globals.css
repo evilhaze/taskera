@@ -5,26 +5,26 @@
 /* Asana Dark Theme Design System — design tokens */
 @layer base {
   :root {
-    /* Backgrounds (darkest to lightest) */
-    --asana-bg-app: #1E1E2A;
-    --asana-bg-sidebar: #1A1A24;
-    --asana-bg-content: #252530;
-    --asana-bg-input: #2A2A38;
-    --asana-bg-card: #2E2E3E;
-    --asana-bg-card-hover: #333345;
-    --asana-bg-input-focus: #2E2E3E;
+    /* Backgrounds (darkest to lightest) — gray/black palette */
+    --asana-bg-app: #1A1A1A;
+    --asana-bg-sidebar: #242424;
+    --asana-bg-content: #2C2C2C;
+    --asana-bg-input: #2D2D2D;
+    --asana-bg-card: #3B3B3B;
+    --asana-bg-card-hover: #404040;
+    --asana-bg-input-focus: #353535;
     /* Text */
-    --asana-text-primary: #E8E8F0;
-    --asana-text-secondary: #9090A8;
-    --asana-text-placeholder: #606078;
-    --asana-text-disabled: #454560;
+    --asana-text-primary: #E8E8E8;
+    --asana-text-secondary: #B0B0B0;
+    --asana-text-placeholder: #808080;
+    --asana-text-disabled: #606060;
     /* Borders */
-    --asana-border: #3A3A50;
-    --asana-border-subtle: #2E2E42;
-    --asana-border-focus: #4986FF;
+    --asana-border: #454545;
+    --asana-border-subtle: #383838;
+    --asana-border-focus: #0052CC;
     /* Brand */
-    --asana-blue: #4986FF;
-    --asana-blue-dark: #3070EE;
+    --asana-blue: #0052CC;
+    --asana-blue-dark: #0042A3;
     --asana-coral: #F06A6A;
     --asana-coral-dark: #E05555;
     --asana-green: #4EC9A0;
@@ -77,7 +77,7 @@
   .input-base:focus {
     outline: none;
     border-color: var(--asana-border-focus);
-    box-shadow: 0 0 0 3px rgba(73, 134, 255, 0.15);
+    box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.2);
   }
 
   .btn-primary {
@@ -88,21 +88,21 @@
     padding: 7px 16px;
     border-radius: 6px;
     border: none;
-    box-shadow: 0 1px 4px rgba(73, 134, 255, 0.3);
+    box-shadow: 0 1px 4px rgba(0, 82, 204, 0.35);
     transition: background 0.2s, box-shadow 0.2s;
   }
   .btn-primary:hover {
     background: var(--asana-blue-dark);
-    box-shadow: 0 2px 8px rgba(73, 134, 255, 0.4);
+    box-shadow: 0 2px 8px rgba(0, 82, 204, 0.45);
   }
   .btn-primary:focus {
-    outline: 2px solid rgba(73, 134, 255, 0.5);
+    outline: 2px solid rgba(0, 82, 204, 0.5);
     outline-offset: 2px;
   }
   .btn-primary:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background: #2A3A60;
+    background: #2D3A4D;
   }
 
   .btn-create {
@@ -139,7 +139,7 @@
     color: var(--asana-text-primary);
   }
   .btn-secondary:focus {
-    outline: 2px solid rgba(73, 134, 255, 0.3);
+    outline: 2px solid rgba(0, 82, 204, 0.3);
     outline-offset: 2px;
   }
   .btn-secondary:disabled {
@@ -157,7 +157,7 @@
 
   .card-hover:hover {
     background: var(--asana-bg-card-hover);
-    border-color: #4A4A62;
+    border-color: #4A4A4A;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   }
 
