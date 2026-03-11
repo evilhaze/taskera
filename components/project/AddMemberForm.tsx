@@ -2,9 +2,9 @@
 
 import { FormEvent, useState } from "react";
 
-type Props = { projectId: string };
+type Props = { projectId: string; onSuccess?: () => void };
 
-export function AddMemberForm({ projectId }: Props) {
+export function AddMemberForm({ projectId, onSuccess }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -32,8 +32,9 @@ export function AddMemberForm({ projectId }: Props) {
       return;
     }
 
-    setSuccess(`Участник ${data.email} добавлен. Обновите страницу, чтобы увидеть список.`);
+    setSuccess(`Участник ${data.email} добавлен.`);
     form.reset();
+    onSuccess?.();
   }
 
   return (

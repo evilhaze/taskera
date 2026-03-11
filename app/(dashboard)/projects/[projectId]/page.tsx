@@ -2,7 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { AddMemberForm } from "@/components/project/AddMemberForm";
+import { MembersSection } from "@/components/project/MembersSection";
 
 type Props = { params: Promise<{ projectId: string }> };
 
@@ -55,30 +55,13 @@ export default async function ProjectPage({ params }: Props) {
           </p>
         </header>
 
-        <section className="mb-8">
-          <h2 className="text-lg font-medium text-slate-200 mb-3">Участники</h2>
-          <ul className="rounded-lg border border-slate-700 bg-slate-900/50 divide-y divide-slate-700">
-            {project.members.map((m) => (
-              <li key={m.id} className="flex items-center justify-between px-4 py-3">
-                <div>
-                  <span className="text-slate-200">{m.user.email}</span>
-                  {m.user.name && (
-                    <span className="ml-2 text-slate-500 text-sm">{m.user.name}</span>
-                  )}
-                </div>
-                <span className="text-xs text-slate-500">
-                  {m.userId === project.ownerId ? "Владелец" : "Участник"}
-                </span>
-              </li>
-            ))}
-          </ul>
-
-          {isOwner && (
-            <div className="mt-4">
-              <AddMemberForm projectId={project.id} />
-            </div>
-          )}
-        </section>
+        <MembersSection
+          projectId={project.id}
+          members={project.members}
+          ownerId={project.ownerId}
+          currentUserId={user.id}
+          isOwner={isOwner}
+        />
 
         <section className="rounded-lg border border-slate-700 bg-slate-900/50 p-4 text-slate-400 text-center">
           <p>Канбан-доска и задачи будут на этой странице в следующем шаге.</p>
