@@ -194,34 +194,53 @@ export async function getDashboardAnalytics(
   const assigneeIds = [
     ...new Set(workloadRaw.map((w) => w.assigneeId).filter(Boolean))
   ] as string[];
-  const workloadDetails =
+
+  const [workloadTotal, workloadOverdue, workloadDone] =
     assigneeIds.length === 0
-      ? []
-      : await Promise.all(
-          assigneeIds.map(async (assigneeId) => {
-            const [total, overdue, done] = await Promise.all([
-              prisma.task.count({
-                where: { projectId: { in: projectIds }, assigneeId }
-              }),
-              prisma.task.count({
-                where: {
-                  projectId: { in: projectIds },
-                  assigneeId,
-                  deadline: { lt: now },
-                  status: { not: "DONE" }
-                }
-              }),
-              prisma.task.count({
-                where: {
-                  projectId: { in: projectIds },
-                  assigneeId,
-                  status: "DONE"
-                }
-              })
-            ]);
-            return { assigneeId, total, overdue, done };
+      ? [[], [], []]
+      : await Promise.all([
+          prisma.task.groupBy({
+            by: ["assigneeId"],
+            where: { projectId: { in: projectIds }, assigneeId: { not: null } },
+            _count: { _all: true }
+          }),
+          prisma.task.groupBy({
+            by: ["assigneeId"],
+            where: {
+              projectId: { in: projectIds },
+              assigneeId: { not: null },
+              deadline: { lt: now },
+              status: { not: "DONE" }
+            },
+            _count: { _all: true }
+          }),
+          prisma.task.groupBy({
+            by: ["assigneeId"],
+            where: {
+              projectId: { in: projectIds },
+              assigneeId: { not: null },
+              status: "DONE"
+            },
+            _count: { _all: true }
           })
-        );
+        ]);
+
+  const totalByAssignee = new Map(
+    workloadTotal.map((g) => [g.assigneeId!, g._count._all])
+  );
+  const overdueByAssignee = new Map(
+    workloadOverdue.map((g) => [g.assigneeId!, g._count._all])
+  );
+  const doneByAssignee = new Map(
+    workloadDone.map((g) => [g.assigneeId!, g._count._all])
+  );
+
+  const workloadDetails = assigneeIds.map((assigneeId) => ({
+    assigneeId,
+    total: totalByAssignee.get(assigneeId) ?? 0,
+    overdue: overdueByAssignee.get(assigneeId) ?? 0,
+    done: doneByAssignee.get(assigneeId) ?? 0
+  }));
 
   const users =
     assigneeIds.length === 0

@@ -61,6 +61,11 @@ type Project = {
   progressPercent?: number;
 };
 
+type AppSidebarProps = {
+  initialProjects?: Array<{ id: string; name: string; progressPercent: number }>;
+  initialStats?: { todayTasksCount: number; unreadNotificationsCount: number };
+};
+
 function NavLink({
   href,
   isActive,
@@ -90,15 +95,17 @@ function NavLink({
   );
 }
 
-export function AppSidebar() {
+export function AppSidebar({ initialProjects, initialStats }: AppSidebarProps = {}) {
   const pathname = usePathname();
   const projectId = pathname.startsWith("/app/projects/") ? pathname.split("/")[3] : null;
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>(
+    initialProjects?.map((p) => ({ id: p.id, name: p.name, progressPercent: p.progressPercent })) ?? []
+  );
   const [recentIds, setRecentIds] = useState<string[]>([]);
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [stats, setStats] = useState<{ todayTasksCount: number; unreadNotificationsCount: number }>({
-    todayTasksCount: 0,
-    unreadNotificationsCount: 0
+    todayTasksCount: initialStats?.todayTasksCount ?? 0,
+    unreadNotificationsCount: initialStats?.unreadNotificationsCount ?? 0
   });
 
   useEffect(() => {
@@ -115,31 +122,27 @@ export function AppSidebar() {
   }, [projectId]);
 
   useEffect(() => {
-    fetch("/api/projects")
-      .then((res) => (res.ok ? res.json() : []))
-      .then((data) =>
-        setProjects(
-          Array.isArray(data)
-            ? data.map((p: { id: string; name: string; progressPercent?: number }) => ({
-                id: p.id,
-                name: p.name,
-                progressPercent: p.progressPercent ?? 0
-              }))
-            : []
-        )
-      );
-  }, []);
-
-  useEffect(() => {
-    fetch("/api/sidebar-stats")
-      .then((r) => (r.ok ? r.json() : {}))
-      .then((data: { todayTasksCount?: number; unreadNotificationsCount?: number }) =>
-        setStats({
-          todayTasksCount: data.todayTasksCount ?? 0,
-          unreadNotificationsCount: data.unreadNotificationsCount ?? 0
-        })
-      );
-  }, []);
+    if (initialProjects !== undefined) return;
+    fetch("/api/dashboard-data")
+      .then((res) => (res.ok ? res.json() : {}))
+      .then((data: { projects?: Array<{ id: string; name: string; progressPercent?: number }>; sidebarStats?: { todayTasksCount?: number; unreadNotificationsCount?: number } }) => {
+        if (Array.isArray(data.projects)) {
+          setProjects(
+            data.projects.map((p) => ({
+              id: p.id,
+              name: p.name,
+              progressPercent: p.progressPercent ?? 0
+            }))
+          );
+        }
+        if (data.sidebarStats) {
+          setStats({
+            todayTasksCount: data.sidebarStats.todayTasksCount ?? 0,
+            unreadNotificationsCount: data.sidebarStats.unreadNotificationsCount ?? 0
+          });
+        }
+      });
+  }, [initialProjects]);
 
   const isHome = pathname === "/app" || pathname === "/app/dashboard";
   const isMyTasks = pathname === "/app/my-tasks";

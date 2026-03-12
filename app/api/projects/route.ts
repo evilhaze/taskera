@@ -14,8 +14,10 @@ export async function GET() {
     where: { userId: user.id },
     include: {
       project: {
-        include: {
-          owner: { select: { id: true, email: true, name: true } },
+        select: {
+          id: true,
+          name: true,
+          description: true,
           _count: { select: { members: true, tasks: true } }
         }
       }

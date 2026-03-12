@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/styles/globals.css";
-import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { ThemeWrapper } from "@/components/layout/ThemeWrapper";
 
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
@@ -28,7 +28,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeWrapper>{children}</ThemeWrapper>
       </body>
     </html>
   );
