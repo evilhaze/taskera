@@ -48,29 +48,27 @@ export function LandingNavbar() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <Link
+            href="/login"
+            className="inline-flex items-center rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm transition-colors hover:border-neutral-400 hover:bg-neutral-50"
+          >
+            Войти
+          </Link>
           {user ? (
             <Link
               href="/app/dashboard"
-              className="inline-flex items-center gap-2 rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm transition-colors hover:border-neutral-400 hover:bg-neutral-50"
+              className="inline-flex items-center gap-2 rounded-lg bg-neutral-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
             >
               <LayoutDashboard className="h-4 w-4" aria-hidden />
               В приложение
             </Link>
           ) : (
-            <>
-              <Link
-                href="/login"
-                className="inline-flex items-center rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm transition-colors hover:border-neutral-400 hover:bg-neutral-50"
-              >
-                Войти
-              </Link>
-              <Link
-                href="/register"
-                className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
-              >
-                Начать
-              </Link>
-            </>
+            <Link
+              href="/register"
+              className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+            >
+              Начать
+            </Link>
           )}
           <button
             type="button"
