@@ -3,28 +3,31 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LayoutGrid, BarChart3, FileText } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-const TABS = [
+type PreviewTab = "task" | "kanban" | "dashboard";
+
+const TABS: { id: PreviewTab; label: string; icon: LucideIcon }[] = [
   { id: "kanban", label: "Kanban board", icon: LayoutGrid },
   { id: "task", label: "Task modal", icon: FileText },
   { id: "dashboard", label: "Dashboard analytics", icon: BarChart3 }
 ];
 
-const PREVIEW_IMAGES = {
+const PREVIEW_IMAGES: Record<PreviewTab, string> = {
   kanban: "/landing/kanban.png",
   task: "/landing/task-modal.png",
   dashboard: "/landing/dashboard.png"
-} as const;
+};
 
 export function ProductPreviewSection() {
-  const [active, setActive] = useState<keyof typeof PREVIEW_IMAGES>("kanban");
+  const [active, setActive] = useState<PreviewTab>("kanban");
   const [imgError, setImgError] = useState(false);
 
   const imgSrc = PREVIEW_IMAGES[active];
 
-  const handleTab = (id: keyof typeof PREVIEW_IMAGES) => {
+  const handleTab = (tab: PreviewTab) => {
     setImgError(false);
-    setActive(id);
+    setActive(tab);
   };
 
   return (
