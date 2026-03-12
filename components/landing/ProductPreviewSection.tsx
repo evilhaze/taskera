@@ -15,7 +15,7 @@ const TABS: { id: PreviewTab; label: string; icon: LucideIcon }[] = [
 
 const PREVIEW_IMAGES: Record<PreviewTab, string> = {
   kanban: "/landing/kanban.png",
-  task: "/landing/task-modal.png",
+  task: "/landing/task-modal2.png",
   dashboard: "/landing/dashboard.png"
 };
 
@@ -93,7 +93,7 @@ export function ProductPreviewSection() {
                 />
               ) : (
                 <p className="text-neutral-500 text-sm py-12">
-                  Добавьте скриншоты в <code className="bg-neutral-200 px-1 rounded">public/landing/</code>: kanban.png, task-modal.png, dashboard.png
+                  Добавьте скриншоты в <code className="bg-neutral-200 px-1 rounded">public/landing/</code>: kanban.png, task-modal2.png, dashboard.png
                 </p>
               )}
             </motion.div>

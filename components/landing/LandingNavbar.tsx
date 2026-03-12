@@ -54,6 +54,12 @@ export function LandingNavbar() {
           >
             Войти
           </Link>
+          <Link
+            href="/register"
+            className="inline-flex items-center rounded-lg border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm transition-colors hover:border-neutral-400 hover:bg-neutral-50"
+          >
+            Регистрация
+          </Link>
           {user ? (
             <Link
               href="/app/dashboard"
@@ -116,6 +122,13 @@ export function LandingNavbar() {
                 className="rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
               >
                 Войти
+              </Link>
+              <Link
+                href="/register"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+              >
+                Регистрация
               </Link>
               <Link
                 href="/register"
