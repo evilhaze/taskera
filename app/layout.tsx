@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Task SaaS",
-  description: "Управление задачами и проектами"
+  title: "Flowboard — Управление задачами и проектами",
+  description: "Современная SaaS-платформа для управления задачами, проектами и командами. Kanban, аналитика, AI-помощник."
 };
 
 export default function RootLayout({

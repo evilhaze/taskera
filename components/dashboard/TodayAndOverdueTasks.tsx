@@ -42,7 +42,7 @@ export function TodayAndOverdueTasks({ overdue, dueToday }: Props) {
                 {overdue.map((task) => (
                   <li key={task.id}>
                     <Link
-                      href={`/projects/${task.project.id}`}
+                      href={`/app/projects/${task.project.id}`}
                       className="flex flex-wrap items-baseline gap-2 text-sm text-[var(--asana-text-primary)] hover:text-[var(--asana-blue)] transition-colors"
                     >
                       <span className="font-medium">{task.title}</span>
@@ -68,7 +68,7 @@ export function TodayAndOverdueTasks({ overdue, dueToday }: Props) {
                 {dueToday.map((task) => (
                   <li key={task.id}>
                     <Link
-                      href={`/projects/${task.project.id}`}
+                      href={`/app/projects/${task.project.id}`}
                       className="flex flex-wrap items-baseline gap-2 text-sm text-[var(--asana-text-primary)] hover:text-[var(--asana-blue)] transition-colors"
                     >
                       <span className="font-medium">{task.title}</span>

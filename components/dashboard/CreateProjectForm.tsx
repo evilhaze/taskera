@@ -31,7 +31,7 @@ export function CreateProjectForm() {
       return;
     }
 
-    router.push(`/projects/${data.id}`);
+    router.push(`/app/projects/${data.id}`);
   }
 
   return (

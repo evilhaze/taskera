@@ -48,7 +48,7 @@ export async function createActivity(params: {
         type,
         message,
         taskId: taskId ?? null,
-        metadata: metadata ? (metadata as object) : null
+        metadata: metadata ? (metadata as object) : undefined
       }
     });
   } catch {

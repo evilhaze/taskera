@@ -106,6 +106,7 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
   const [subtaskDeletingId, setSubtaskDeletingId] = useState<string | null>(null);
 
   const overlayRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -116,6 +117,17 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
     }
     setMounted(false);
   }, [open]);
+
+  // Перенос фокуса в модалку при открытии, чтобы не оставаться в поле поиска шапки
+  useEffect(() => {
+    if (!open) return;
+    const el = contentRef.current;
+    if (!el) return;
+    const t = setTimeout(() => {
+      el.focus();
+    }, 50);
+    return () => clearTimeout(t);
+  }, [open, mounted]);
 
   const fetchTask = useCallback(async (id: string) => {
     const res = await fetch(`/api/tasks/${id}`);
@@ -338,7 +350,9 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
       onClick={handleOverlayClick}
     >
       <div
-        className={`relative flex max-h-[90vh] w-full max-w-3xl flex-col rounded-xl border border-[var(--asana-border)] bg-[var(--asana-bg-card)] shadow-2xl transition-all duration-200 ease-out ${
+        ref={contentRef}
+        tabIndex={-1}
+        className={`relative flex max-h-[90vh] w-full max-w-3xl flex-col rounded-xl border border-[var(--asana-border)] bg-[var(--asana-bg-card)] shadow-2xl transition-all duration-200 ease-out outline-none ${
           mounted ? "scale-100 opacity-100" : "scale-95 opacity-0"
         }`}
         onClick={(e) => e.stopPropagation()}

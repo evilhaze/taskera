@@ -144,7 +144,7 @@ export function MyTasksView({
             )}
           </div>
           <Link
-            href="/"
+            href="/app/dashboard"
             className="btn-secondary text-sm"
           >
             Поделиться

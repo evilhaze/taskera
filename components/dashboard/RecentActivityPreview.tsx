@@ -44,7 +44,7 @@ export function RecentActivityPreview({ activities }: Props) {
         </h3>
         {activities.length > 0 && (
           <Link
-            href="/"
+            href="/app/dashboard"
             className="text-xs font-medium text-[var(--asana-blue)] hover:underline"
           >
             Все проекты

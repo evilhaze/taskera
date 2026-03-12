@@ -54,7 +54,7 @@ export function OverdueInsight({ count, tasks }: Props) {
           {tasks.map((task) => (
             <li key={task.id}>
               <Link
-                href={`/projects/${task.projectId}`}
+                href={`/app/projects/${task.projectId}`}
                 className="flex flex-col gap-0.5 rounded-md py-1.5 px-2 -mx-2 text-sm text-[var(--asana-text-primary)] transition-colors hover:bg-[var(--asana-red)]/20 hover:text-[var(--asana-text-primary)]"
               >
                 <span className="font-medium truncate">{task.title}</span>

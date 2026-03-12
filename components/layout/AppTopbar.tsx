@@ -12,7 +12,7 @@ export function AppTopbar({ user }: Props) {
     <header className="sticky top-0 z-20 flex h-12 items-center justify-between border-b border-[var(--asana-border-subtle)] bg-[var(--asana-bg-app)] px-4">
       <div className="flex items-center gap-3">
         <Link
-          href="/?create=project"
+          href="/app/dashboard?create=project"
           className="btn-create inline-flex items-center gap-1.5 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--asana-border)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--asana-bg-app)]"
         >
           <span aria-hidden>+</span>

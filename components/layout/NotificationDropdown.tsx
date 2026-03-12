@@ -111,7 +111,7 @@ export function NotificationDropdown() {
                     {data.overdue.map((task) => (
                       <Link
                         key={task.id}
-                        href="/notifications"
+                        href="/app/notifications"
                         onClick={() => setOpen(false)}
                         className="block border-b border-[var(--asana-border-subtle)] px-3 py-2 text-sm hover:bg-white/5 transition-colors last:border-b-0"
                         role="menuitem"
@@ -135,7 +135,7 @@ export function NotificationDropdown() {
                     {data.dueToday.map((task) => (
                       <Link
                         key={task.id}
-                        href="/notifications"
+                        href="/app/notifications"
                         onClick={() => setOpen(false)}
                         className="block border-b border-[var(--asana-border-subtle)] px-3 py-2 text-sm hover:bg-white/5 transition-colors last:border-b-0"
                         role="menuitem"
@@ -160,7 +160,7 @@ export function NotificationDropdown() {
           </div>
           <div className="border-t border-[var(--asana-border-subtle)] px-2 py-2">
             <Link
-              href="/notifications"
+              href="/app/notifications"
               onClick={() => setOpen(false)}
               className="block rounded-md px-2 py-1.5 text-center text-sm font-medium text-[var(--asana-blue)] hover:bg-white/5 transition-colors"
               role="menuitem"

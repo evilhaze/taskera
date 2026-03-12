@@ -69,7 +69,7 @@ export function AppSidebar() {
   useEffect(() => {
     fetch("/api/sidebar-stats")
       .then((r) => (r.ok ? r.json() : {}))
-      .then((data) =>
+      .then((data: { todayTasksCount?: number; unreadNotificationsCount?: number }) =>
         setStats({
           todayTasksCount: data.todayTasksCount ?? 0,
           unreadNotificationsCount: data.unreadNotificationsCount ?? 0
@@ -77,14 +77,14 @@ export function AppSidebar() {
       );
   }, []);
 
-  const isHome = pathname === "/";
-  const isMyTasks = pathname === "/my-tasks";
-  const isToday = pathname === "/today";
-  const isNotifications = pathname === "/notifications";
-  const isTeam = pathname === "/team";
-  const isActivity = pathname === "/activity";
-  const isCalendar = pathname === "/calendar";
-  const projectId = pathname.startsWith("/projects/") ? pathname.split("/")[2] : null;
+  const isHome = pathname === "/app" || pathname === "/app/dashboard";
+  const isMyTasks = pathname === "/app/my-tasks";
+  const isToday = pathname === "/app/today";
+  const isNotifications = pathname === "/app/notifications";
+  const isTeam = pathname === "/app/team";
+  const isActivity = pathname === "/app/activity";
+  const isCalendar = pathname === "/app/calendar";
+  const projectId = pathname.startsWith("/app/projects/") ? pathname.split("/")[3] : null;
 
   return (
     <aside
@@ -94,16 +94,16 @@ export function AppSidebar() {
       <div className="flex flex-col gap-4 p-3">
         <SidebarSection title="Workspace" defaultOpen={true}>
           <div className="flex flex-col gap-0.5">
-            <NavLink href="/" isActive={isHome} icon={Home}>
+            <NavLink href="/app/dashboard" isActive={isHome} icon={Home}>
               Главная
             </NavLink>
-            <NavLink href="/today" isActive={isToday} icon={CalendarDays} badge={<SidebarBadge value={stats.todayTasksCount} variant="amber" />}>
+            <NavLink href="/app/today" isActive={isToday} icon={CalendarDays} badge={<SidebarBadge value={stats.todayTasksCount} variant="amber" />}>
               Сегодня
             </NavLink>
-            <NavLink href="/my-tasks" isActive={isMyTasks} icon={CheckSquare}>
+            <NavLink href="/app/my-tasks" isActive={isMyTasks} icon={CheckSquare}>
               Мои задачи
             </NavLink>
-            <NavLink href="/notifications" isActive={isNotifications} icon={Bell} badge={<SidebarBadge value={stats.unreadNotificationsCount} variant="violet" />}>
+            <NavLink href="/app/notifications" isActive={isNotifications} icon={Bell} badge={<SidebarBadge value={stats.unreadNotificationsCount} variant="violet" />}>
               Уведомления
             </NavLink>
           </div>
@@ -111,13 +111,13 @@ export function AppSidebar() {
 
         <SidebarSection title="Team" defaultOpen={false}>
           <div className="flex flex-col gap-0.5">
-            <NavLink href="/team" isActive={isTeam} icon={Users}>
+            <NavLink href="/app/team" isActive={isTeam} icon={Users}>
               Команда
             </NavLink>
-            <NavLink href="/activity" isActive={isActivity} icon={Activity}>
+            <NavLink href="/app/activity" isActive={isActivity} icon={Activity}>
               Активность
             </NavLink>
-            <NavLink href="/calendar" isActive={isCalendar} icon={Calendar}>
+            <NavLink href="/app/calendar" isActive={isCalendar} icon={Calendar}>
               Календарь
             </NavLink>
           </div>
@@ -126,7 +126,7 @@ export function AppSidebar() {
         <SidebarSection title="Projects" defaultOpen={true}>
           <div className="flex flex-col gap-0.5">
             <Link
-              href="/?create=project"
+              href="/app/dashboard?create=project"
               className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium text-[var(--asana-text-secondary)] transition-colors hover:bg-white/5 hover:text-[var(--asana-text-primary)]"
             >
               <Plus className="h-4 w-4 shrink-0" aria-hidden />
@@ -143,7 +143,7 @@ export function AppSidebar() {
                 return (
                   <li key={p.id}>
                     <Link
-                      href={`/projects/${p.id}`}
+                      href={`/app/projects/${p.id}`}
                       className={`flex flex-col gap-1 rounded-md px-2.5 py-1.5 text-sm transition-colors ${
                         isActive
                           ? "bg-white/10 font-medium text-[var(--asana-text-primary)]"

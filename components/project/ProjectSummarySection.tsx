@@ -28,7 +28,7 @@ export function ProjectSummarySection({
   return (
     <header className="mb-8">
       <Link
-        href="/"
+        href="/app/dashboard"
         className="inline-flex items-center gap-1.5 text-sm text-[var(--asana-text-secondary)] hover:text-[var(--asana-text-primary)] transition-colors mb-4"
       >
         <span aria-hidden>←</span>

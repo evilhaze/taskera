@@ -32,7 +32,7 @@ export default function RegisterPage() {
       return;
     }
 
-    window.location.href = "/";
+    window.location.href = "/app/dashboard";
   }
 
   return (

@@ -20,7 +20,7 @@ type Props = {
 export function ProjectOverviewCard({ project }: Props) {
   return (
     <Link
-      href={`/projects/${project.id}`}
+      href={`/app/projects/${project.id}`}
       className="block rounded-xl border border-[var(--asana-border-subtle)] bg-[var(--asana-bg-card)] p-5 transition-all hover:border-[var(--asana-border)] hover:shadow-md hover:shadow-black/5"
     >
       <div className="flex items-start justify-between gap-2">

@@ -70,7 +70,7 @@ export function ProfileDropdown({ user }: Props) {
           </div>
           <div className="py-1">
             <Link
-              href="/settings/profile"
+              href="/app/settings/profile"
               onClick={() => setOpen(false)}
               className="flex items-center gap-2.5 px-3 py-2 text-sm text-[var(--asana-text-secondary)] hover:bg-white/5 hover:text-[var(--asana-text-primary)] transition-colors"
               role="menuitem"

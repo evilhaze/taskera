@@ -206,7 +206,7 @@ export async function PATCH(
       type: "TASK_ASSIGNEE_CHANGED",
       message,
       taskId,
-      metadata: { taskTitle, assigneeEmail }
+      metadata: { taskTitle, assigneeEmail: assigneeEmail ?? undefined }
     });
   }
   if (updatePayload.priority !== undefined && task.priority !== updatePayload.priority) {

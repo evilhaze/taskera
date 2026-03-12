@@ -116,7 +116,7 @@ export function ProfileSettingsClient() {
   return (
     <div className="mx-auto max-w-xl">
       <Link
-        href="/"
+        href="/app/dashboard"
         className="inline-flex items-center gap-1.5 text-sm text-[var(--asana-text-secondary)] hover:text-[var(--asana-text-primary)] transition-colors mb-6"
       >
         <span aria-hidden>←</span>
@@ -275,7 +275,7 @@ export function ProfileSettingsClient() {
             >
               {saving ? "Сохранение…" : "Сохранить"}
             </button>
-            <Link href="/" className="btn-secondary">
+            <Link href="/app/dashboard" className="btn-secondary">
               Отмена
             </Link>
           </div>

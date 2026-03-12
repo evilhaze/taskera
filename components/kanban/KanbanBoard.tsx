@@ -191,7 +191,11 @@ function DraggableCard({
       <div
         role="button"
         tabIndex={0}
-        onClick={() => onTaskClick?.(task.id)}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onTaskClick?.(task.id);
+        }}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
