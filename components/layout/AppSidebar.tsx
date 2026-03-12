@@ -3,9 +3,57 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Users, Activity, Calendar, Home, CheckSquare, Bell, Plus } from "lucide-react";
+import { CalendarDays, Users, Activity, Calendar, Home, CheckSquare, Bell, Plus, Star, Clock } from "lucide-react";
 import { SidebarSection } from "./SidebarSection";
 import { SidebarBadge } from "./SidebarBadge";
+
+const RECENT_KEY = "sidebar-recent-project-ids";
+const FAVORITES_KEY = "sidebar-favorite-project-ids";
+const RECENT_MAX = 5;
+
+function getRecentIds(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(RECENT_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function persistRecentIds(ids: string[]) {
+  try {
+    localStorage.setItem(RECENT_KEY, JSON.stringify(ids.slice(0, RECENT_MAX)));
+  } catch {}
+}
+
+function getFavoriteIds(): string[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(FAVORITES_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function setFavoriteIds(ids: string[]) {
+  try {
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(ids));
+  } catch {}
+}
+
+function persistFavoriteIds(ids: string[]) {
+  try {
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(ids));
+  } catch {}
+}
+
+function toggleFavorite(id: string, current: string[]) {
+  const next = current.includes(id) ? current.filter((x) => x !== id) : [...current, id];
+  persistFavoriteIds(next);
+  return next;
+}
 
 type Project = {
   id: string;
@@ -44,11 +92,27 @@ function NavLink({
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const projectId = pathname.startsWith("/app/projects/") ? pathname.split("/")[3] : null;
   const [projects, setProjects] = useState<Project[]>([]);
+  const [recentIds, setRecentIds] = useState<string[]>([]);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [stats, setStats] = useState<{ todayTasksCount: number; unreadNotificationsCount: number }>({
     todayTasksCount: 0,
     unreadNotificationsCount: 0
   });
+
+  useEffect(() => {
+    setRecentIds(getRecentIds());
+    setFavoriteIds(getFavoriteIds());
+  }, []);
+
+  useEffect(() => {
+    if (!projectId) return;
+    const prev = getRecentIds();
+    const next = [projectId, ...prev.filter((id) => id !== projectId)].slice(0, RECENT_MAX);
+    persistRecentIds(next);
+    setRecentIds(next);
+  }, [projectId]);
 
   useEffect(() => {
     fetch("/api/projects")
@@ -84,7 +148,6 @@ export function AppSidebar() {
   const isTeam = pathname === "/app/team";
   const isActivity = pathname === "/app/activity";
   const isCalendar = pathname === "/app/calendar";
-  const projectId = pathname.startsWith("/app/projects/") ? pathname.split("/")[3] : null;
 
   return (
     <aside
@@ -130,8 +193,59 @@ export function AppSidebar() {
               className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium text-[var(--asana-text-secondary)] transition-colors hover:bg-white/5 hover:text-[var(--asana-text-primary)]"
             >
               <Plus className="h-4 w-4 shrink-0" aria-hidden />
-              <span>Create project</span>
+              <span>Создать проект</span>
             </Link>
+            {recentIds.length > 0 && (
+              <>
+                <p className="mt-2 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--asana-text-placeholder)]">Недавние</p>
+                <ul className="space-y-0.5">
+                  {recentIds.map((id) => {
+                    const p = projects.find((x) => x.id === id);
+                    if (!p) return null;
+                    const isActive = projectId === p.id;
+                    return (
+                      <li key={p.id}>
+                        <Link
+                          href={`/app/projects/${p.id}`}
+                          className={`flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm transition-colors ${
+                            isActive ? "bg-white/10 font-medium text-[var(--asana-text-primary)]" : "text-[var(--asana-text-secondary)] hover:bg-white/5 hover:text-[var(--asana-text-primary)]"
+                          }`}
+                        >
+                          <Clock className="h-3.5 w-3.5 shrink-0 text-[var(--asana-text-placeholder)]" />
+                          <span className="truncate">{p.name}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            )}
+            {favoriteIds.length > 0 && (
+              <>
+                <p className="mt-2 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--asana-text-placeholder)]">Избранное</p>
+                <ul className="space-y-0.5">
+                  {favoriteIds.map((id) => {
+                    const p = projects.find((x) => x.id === id);
+                    if (!p) return null;
+                    const isActive = projectId === p.id;
+                    return (
+                      <li key={p.id}>
+                        <Link
+                          href={`/app/projects/${p.id}`}
+                          className={`flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm transition-colors ${
+                            isActive ? "bg-white/10 font-medium text-[var(--asana-text-primary)]" : "text-[var(--asana-text-secondary)] hover:bg-white/5 hover:text-[var(--asana-text-primary)]"
+                          }`}
+                        >
+                          <Star className="h-3.5 w-3.5 shrink-0 fill-amber-400 text-amber-400" />
+                          <span className="truncate">{p.name}</span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            )}
+            <p className="mt-2 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--asana-text-placeholder)]">Все проекты</p>
             {projects.length === 0 ? (
               <div className="px-2.5 py-1.5 text-sm text-[var(--asana-text-placeholder)]">
                 Нет проектов
@@ -139,38 +253,50 @@ export function AppSidebar() {
             ) : (
               <ul className="space-y-0.5">
                 {projects.map((p) => {
-                const isActive = projectId === p.id;
-                return (
-                  <li key={p.id}>
-                    <Link
-                      href={`/app/projects/${p.id}`}
-                      className={`flex flex-col gap-1 rounded-md px-2.5 py-1.5 text-sm transition-colors ${
-                        isActive
-                          ? "bg-white/10 font-medium text-[var(--asana-text-primary)]"
-                          : "text-[var(--asana-text-secondary)] hover:bg-white/5 hover:text-[var(--asana-text-primary)]"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="h-2 w-2 shrink-0 rounded-full bg-[var(--asana-green)]"
-                          aria-hidden
-                        />
-                        <span className="truncate">{p.name}</span>
-                      </div>
-                      <div
-                        className="h-0.5 w-full overflow-hidden rounded-full bg-[var(--asana-bg-input)]"
-                        aria-hidden
+                  const isActive = projectId === p.id;
+                  const isFav = favoriteIds.includes(p.id);
+                  return (
+                    <li key={p.id} className="group flex items-center gap-0.5">
+                      <Link
+                        href={`/app/projects/${p.id}`}
+                        className={`flex flex-1 min-w-0 flex-col gap-1 rounded-md px-2.5 py-1.5 text-sm transition-colors ${
+                          isActive
+                            ? "bg-white/10 font-medium text-[var(--asana-text-primary)]"
+                            : "text-[var(--asana-text-secondary)] hover:bg-white/5 hover:text-[var(--asana-text-primary)]"
+                        }`}
                       >
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="h-2 w-2 shrink-0 rounded-full bg-[var(--asana-green)]"
+                            aria-hidden
+                          />
+                          <span className="truncate">{p.name}</span>
+                        </div>
                         <div
-                          className="h-full rounded-full bg-[var(--progress-fill)] transition-[width] duration-500 ease-out"
-                          style={{ width: `${Math.min(100, Math.max(0, p.progressPercent ?? 0))}%` }}
-                        />
-                      </div>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+                          className="h-0.5 w-full overflow-hidden rounded-full bg-[var(--asana-bg-input)]"
+                          aria-hidden
+                        >
+                          <div
+                            className="h-full rounded-full bg-[var(--progress-fill)] transition-[width] duration-500 ease-out"
+                            style={{ width: `${Math.min(100, Math.max(0, p.progressPercent ?? 0))}%` }}
+                          />
+                        </div>
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setFavoriteIds((prev) => toggleFavorite(p.id, prev));
+                        }}
+                        className={`shrink-0 rounded p-1 opacity-0 transition-opacity group-hover:opacity-100 ${isFav ? "text-amber-400" : "text-[var(--asana-text-placeholder)] hover:text-amber-400"}`}
+                        title={isFav ? "Убрать из избранного" : "В избранное"}
+                      >
+                        <Star className={`h-3.5 w-3.5 ${isFav ? "fill-current" : ""}`} />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
             )}
           </div>
         </SidebarSection>

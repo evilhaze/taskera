@@ -30,18 +30,23 @@ export async function GET(
   const tasks = await prisma.task.findMany({
     where: { projectId },
     include: {
-      assignee: { select: { id: true, email: true, name: true } },
+      assignee: { select: { id: true, email: true, name: true, avatarUrl: true, avatarEmoji: true } },
       taskLabels: {
         include: {
           label: true
         }
       },
-      subtasks: { select: { id: true, isCompleted: true } }
+      subtasks: { select: { id: true, isCompleted: true } },
+      _count: { select: { comments: true } }
     },
     orderBy: [{ status: "asc" }, { order: "asc" }, { createdAt: "desc" }]
   });
 
-  return NextResponse.json(tasks);
+  const serialized = tasks.map(({ _count, ...t }) => ({
+    ...t,
+    commentsCount: _count.comments
+  }));
+  return NextResponse.json(serialized);
 }
 
 export async function POST(
