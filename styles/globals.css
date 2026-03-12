@@ -68,6 +68,28 @@
     --progress-fill-complete: #818CF8;
   }
 
+  /* App light theme */
+  [data-theme="light"] {
+    --asana-bg-app: #f8fafc;
+    --asana-bg-sidebar: #ffffff;
+    --asana-bg-content: #f1f5f9;
+    --asana-bg-input: #ffffff;
+    --asana-bg-card: #ffffff;
+    --asana-bg-card-hover: #f8fafc;
+    --asana-bg-input-focus: #ffffff;
+    --asana-text-primary: #0f172a;
+    --asana-text-secondary: #475569;
+    --asana-text-placeholder: #94a3b8;
+    --asana-text-disabled: #cbd5e1;
+    --asana-border: #e2e8f0;
+    --asana-border-subtle: #f1f5f9;
+    --asana-border-focus: #2563eb;
+    --asana-blue: #2563eb;
+    --asana-blue-dark: #1d4ed8;
+    --progress-track: #e2e8f0;
+    --progress-fill: #6366f1;
+    --progress-fill-complete: #818cf8;
+  }
   html {
     @apply antialiased;
   }

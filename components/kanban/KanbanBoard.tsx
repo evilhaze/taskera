@@ -10,7 +10,8 @@ import {
   useSensor,
   useSensors,
   useDraggable,
-  useDroppable
+  useDroppable,
+  defaultDropAnimation
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { TaskModal } from "@/components/tasks/TaskModal";
@@ -79,8 +80,8 @@ function TaskCard({
       className={
         "rounded-lg border bg-[var(--asana-bg-card)] p-3.5 transition-all duration-200 " +
         (isOverlay
-          ? "border-[var(--asana-blue)]/50 shadow-[0_12px_40px_rgba(0,0,0,0.45)] cursor-grabbing scale-[1.02] ring-2 ring-[var(--asana-blue)]/20"
-          : "border-[var(--asana-border)] shadow-[0_1px_3px_rgba(0,0,0,0.25)] hover:border-[var(--asana-border)] hover:bg-[var(--asana-bg-card-hover)] hover:shadow-[0_4px_14px_rgba(0,0,0,0.35)]")
+          ? "border-[var(--asana-blue)]/50 shadow-[0_20px_50px_rgba(0,0,0,0.35)] cursor-grabbing scale-[1.02] ring-2 ring-[var(--asana-blue)]/20 rotate-[1deg]"
+          : "border-[var(--asana-border)] shadow-[0_1px_3px_rgba(0,0,0,0.25)]")
       }
     >
       <div className="flex items-start gap-2">
@@ -159,8 +160,6 @@ function DraggableCard({
     data: { task }
   });
 
-  // When dragging, don't apply transform — DragOverlay shows the moving card.
-  // Original slot stays in place with reduced opacity for insertion feedback.
   const style = !isDragging && transform
     ? { transform: CSS.Translate.toString(transform) }
     : undefined;
@@ -169,45 +168,31 @@ function DraggableCard({
     <div
       ref={setNodeRef}
       style={style}
+      {...listeners}
+      {...attributes}
+      onClick={() => onTaskClick?.(task.id)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onTaskClick?.(task.id);
+        }
+      }}
+      role="button"
+      tabIndex={0}
       className={
-        "flex items-stretch gap-1 transition-opacity duration-200 " +
-        (isDragging ? "opacity-30" : "opacity-100")
+        "cursor-grab active:cursor-grabbing touch-none rounded-lg outline-none transition-all duration-200 " +
+        "hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(0,0,0,0.25)] " +
+        "focus:ring-2 focus:ring-[var(--asana-blue)]/50 focus:ring-offset-2 focus:ring-offset-[var(--asana-bg-input)] " +
+        (isDragging ? "opacity-40 scale-[0.98]" : "opacity-100")
       }
     >
-      {/* Ручка перетаскивания — только за неё тянем */}
-      <div
-        {...listeners}
-        {...attributes}
-        className="shrink-0 cursor-grab active:cursor-grabbing touch-none self-center rounded p-1.5 -ml-0.5 text-[var(--asana-text-placeholder)] hover:bg-white/5 hover:text-[var(--asana-text-secondary)] transition-colors"
-        title="Перетащить"
-        aria-label="Перетащить"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 16 16" aria-hidden>
-          <path d="M5 3a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM5 8a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
-        </svg>
-      </div>
-      {/* Контент карточки — клик открывает модалку */}
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          onTaskClick?.(task.id);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onTaskClick?.(task.id);
-          }
-        }}
-        className="relative group flex-1 min-w-0 cursor-pointer rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--asana-blue)]/50 focus:ring-offset-2 focus:ring-offset-[var(--asana-bg-input)] transition-shadow duration-200"
-      >
+      <div className="relative group">
         <TaskCard task={task} showProjectInCard={showProjectInCard} />
         <button
           type="button"
+          onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => {
+            e.preventDefault();
             e.stopPropagation();
             onDelete(task.id);
           }}
@@ -246,9 +231,9 @@ function DroppableColumn({
     <div
       ref={setNodeRef}
       className={
-        "min-h-[220px] flex-1 min-w-[260px] max-w-[320px] rounded-xl border px-4 py-4 transition-all duration-200 " +
+        "min-h-[220px] flex-1 min-w-[260px] max-w-[320px] rounded-xl border-2 px-4 py-4 transition-all duration-200 " +
         (isOver
-          ? "border-[var(--asana-blue)]/50 bg-[var(--asana-blue)]/5"
+          ? "border-[var(--asana-blue)]/60 bg-[var(--asana-blue)]/10 shadow-[0_0_0_1px_var(--asana-blue)]/30"
           : "border-[var(--asana-border)] bg-[var(--asana-bg-input)]")
       }
     >
@@ -271,10 +256,10 @@ function DroppableColumn({
         ))}
         {isOver && (
           <div
-            className="rounded-md border-2 border-dashed border-[var(--asana-blue)]/30 bg-[var(--asana-blue)]/5 py-3 text-center text-xs text-[var(--asana-text-placeholder)] transition-opacity duration-200"
+            className="min-h-[72px] rounded-lg border-2 border-dashed border-[var(--asana-blue)]/40 bg-[var(--asana-blue)]/10 flex items-center justify-center transition-all duration-200"
             aria-hidden
           >
-            Отпустите здесь
+            <span className="text-xs font-medium text-[var(--asana-text-placeholder)]">Отпустите здесь</span>
           </div>
         )}
         {onAddTaskInColumn && (
@@ -318,7 +303,7 @@ export function KanbanBoard({
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { distance: 8 }
+      activationConstraint: { distance: 5 }
     })
   );
 
@@ -403,7 +388,13 @@ export function KanbanBoard({
         onSaved={onTaskMoved}
       />
 
-      <DragOverlay>
+      <DragOverlay
+        dropAnimation={{
+          ...defaultDropAnimation,
+          duration: 200,
+          easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)"
+        }}
+      >
         {activeTask ? <TaskCard task={activeTask} isOverlay showProjectInCard={showProjectInCard} /> : null}
       </DragOverlay>
     </DndContext>

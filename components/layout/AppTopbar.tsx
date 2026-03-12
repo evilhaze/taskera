@@ -2,6 +2,7 @@ import Link from "next/link";
 import { NotificationDropdown } from "./NotificationDropdown";
 import { ProfileDropdown } from "./ProfileDropdown";
 import { AIAssistantTrigger } from "@/components/ai/AIAssistantTrigger";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 type Props = {
   user: { id: string; email: string; name: string | null; avatarUrl?: string | null; avatarEmoji?: string | null } | null;
@@ -34,7 +35,8 @@ export function AppTopbar({ user }: Props) {
         </form>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
+        <ThemeToggle />
         <AIAssistantTrigger />
         <NotificationDropdown />
         <ProfileDropdown user={user} />
