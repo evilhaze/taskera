@@ -21,6 +21,13 @@ type Comment = {
   user: User;
 };
 type LabelShape = { id: string; name: string; color: string };
+type SubtaskShape = {
+  id: string;
+  title: string;
+  isCompleted: boolean;
+  taskId: string;
+  createdAt: string;
+};
 type Task = {
   id: string;
   title: string;
@@ -36,6 +43,7 @@ type Task = {
   updatedAt: string;
   comments?: Comment[];
   taskLabels?: { label: LabelShape }[];
+  subtasks?: SubtaskShape[];
 };
 type Member = { id: string; email: string; name: string | null; avatarUrl?: string | null; avatarEmoji?: string | null };
 
@@ -92,6 +100,10 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
   const [editedStatus, setEditedStatus] = useState("TODO");
 
   const [taskActivities, setTaskActivities] = useState<ActivityItemType[]>([]);
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
+  const [subtaskSending, setSubtaskSending] = useState(false);
+  const [subtaskTogglingId, setSubtaskTogglingId] = useState<string | null>(null);
+  const [subtaskDeletingId, setSubtaskDeletingId] = useState<string | null>(null);
 
   const overlayRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -243,6 +255,75 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
     }
   }
 
+  async function handleAddSubtask(e: FormEvent) {
+    e.preventDefault();
+    const title = newSubtaskTitle.trim();
+    if (!taskId || !title || !task) return;
+    setSubtaskSending(true);
+    try {
+      const res = await fetch(`/api/tasks/${taskId}/subtasks`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.id) {
+        setTask({
+          ...task,
+          subtasks: [...(task.subtasks ?? []), { ...data, createdAt: data.createdAt ?? new Date().toISOString() }]
+        });
+        setNewSubtaskTitle("");
+        refetchTaskActivity();
+        onSaved?.();
+      }
+    } finally {
+      setSubtaskSending(false);
+    }
+  }
+
+  async function handleToggleSubtask(subtaskId: string, isCompleted: boolean) {
+    if (!task) return;
+    setSubtaskTogglingId(subtaskId);
+    try {
+      const res = await fetch(`/api/subtasks/${subtaskId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isCompleted })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setTask({
+          ...task,
+          subtasks: (task.subtasks ?? []).map((s) =>
+            s.id === subtaskId ? { ...s, isCompleted: data.isCompleted ?? isCompleted } : s
+          )
+        });
+        refetchTaskActivity();
+        onSaved?.();
+      }
+    } finally {
+      setSubtaskTogglingId(null);
+    }
+  }
+
+  async function handleDeleteSubtask(subtaskId: string) {
+    if (!task) return;
+    setSubtaskDeletingId(subtaskId);
+    try {
+      const res = await fetch(`/api/subtasks/${subtaskId}`, { method: "DELETE" });
+      if (res.ok) {
+        setTask({
+          ...task,
+          subtasks: (task.subtasks ?? []).filter((s) => s.id !== subtaskId)
+        });
+        refetchTaskActivity();
+        onSaved?.();
+      }
+    } finally {
+      setSubtaskDeletingId(null);
+    }
+  }
+
   if (!open) return null;
 
   return (
@@ -295,7 +376,7 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
             </div>
           ) : task ? (
             <div className="grid gap-6 p-6 lg:grid-cols-[1fr,280px]">
-              {/* Left: Description + Comments */}
+              {/* Left: Description + Subtasks + Comments */}
               <div className="space-y-6">
                 <div>
                   <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-[var(--asana-text-secondary)]">
@@ -309,6 +390,71 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
                     className="input-base min-h-[80px] resize-y"
                     placeholder="Добавьте описание…"
                   />
+                </div>
+
+                {/* Subtasks */}
+                <div>
+                  <h3 className="mb-3 text-sm font-semibold text-[var(--asana-text-primary)]">
+                    Подзадачи
+                  </h3>
+                  <ul className="space-y-1">
+                    {(task.subtasks ?? []).map((s) => (
+                      <li
+                        key={s.id}
+                        className="group flex items-center gap-3 rounded-md py-1.5 pr-1 transition-colors hover:bg-[var(--asana-bg-input)]/40"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => handleToggleSubtask(s.id, !s.isCompleted)}
+                          disabled={subtaskTogglingId === s.id}
+                          className="flex h-5 w-5 shrink-0 items-center justify-center rounded border border-[var(--asana-border)] bg-[var(--asana-bg-input)] transition-colors hover:border-[var(--asana-text-secondary)] disabled:opacity-50"
+                          aria-label={s.isCompleted ? "Отметить невыполненной" : "Отметить выполненной"}
+                        >
+                          {s.isCompleted ? (
+                            <svg className="h-3.5 w-3.5 text-[var(--asana-blue)]" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          ) : null}
+                        </button>
+                        <span
+                          className={`min-w-0 flex-1 text-sm ${
+                            s.isCompleted
+                              ? "text-[var(--asana-text-placeholder)] line-through"
+                              : "text-[var(--asana-text-primary)]"
+                          }`}
+                        >
+                          {s.title}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteSubtask(s.id)}
+                          disabled={subtaskDeletingId === s.id}
+                          className="shrink-0 rounded p-1.5 text-[var(--asana-text-placeholder)] opacity-0 transition-opacity hover:bg-white/10 hover:text-[var(--asana-red)] group-hover:opacity-100 disabled:opacity-50"
+                          aria-label="Удалить подзадачу"
+                        >
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                  <form onSubmit={handleAddSubtask} className="mt-3 flex gap-2">
+                    <input
+                      value={newSubtaskTitle}
+                      onChange={(e) => setNewSubtaskTitle(e.target.value)}
+                      placeholder="Добавить подзадачу…"
+                      className="input-base flex-1 text-sm"
+                      maxLength={500}
+                    />
+                    <button
+                      type="submit"
+                      disabled={subtaskSending || !newSubtaskTitle.trim()}
+                      className="btn-secondary shrink-0 text-sm"
+                    >
+                      {subtaskSending ? "…" : "Добавить"}
+                    </button>
+                  </form>
                 </div>
 
                 <div>

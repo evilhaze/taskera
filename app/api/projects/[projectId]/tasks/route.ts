@@ -35,7 +35,8 @@ export async function GET(
         include: {
           label: true
         }
-      }
+      },
+      subtasks: { select: { id: true, isCompleted: true } }
     },
     orderBy: [{ status: "asc" }, { order: "asc" }, { createdAt: "desc" }]
   });
@@ -77,6 +78,29 @@ export async function POST(
 
   const deadlineDate =
     deadline && deadline !== "" ? new Date(deadline) : null;
+
+  if (deadlineDate) {
+    const now = new Date();
+    const startOfToday = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+    );
+    const deadlineDay = new Date(
+      Date.UTC(
+        deadlineDate.getUTCFullYear(),
+        deadlineDate.getUTCMonth(),
+        deadlineDate.getUTCDate()
+      )
+    );
+    if (deadlineDay < startOfToday) {
+      return NextResponse.json(
+        {
+          message:
+            "Дедлайн не может быть раньше сегодняшнего дня. Укажите сегодняшнюю дату или позже."
+        },
+        { status: 400 }
+      );
+    }
+  }
 
   if (assigneeId) {
     const assigneeInProject = await prisma.projectMember.findUnique({

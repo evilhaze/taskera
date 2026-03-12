@@ -20,7 +20,8 @@ async function ensureTaskAccess(userId: string, taskId: string) {
         include: {
           label: true
         }
-      }
+      },
+      subtasks: { orderBy: { createdAt: "asc" } }
     }
   });
   if (!task) return null;
@@ -141,7 +142,8 @@ export async function PATCH(
         include: {
           label: true
         }
-      }
+      },
+      subtasks: { orderBy: { createdAt: "asc" } }
     }
   });
 

@@ -5,6 +5,50 @@ import { PriorityBadge } from "@/components/priority/PriorityBadge";
 
 type Member = { id: string; email: string; name: string | null };
 
+const DEADLINE_ERROR_PAST =
+  "Дедлайн не может быть раньше сегодняшнего дня. Укажите сегодняшнюю дату или позже.";
+const DEADLINE_ERROR_FORMAT =
+  "Введите дату в формате ДД/ММ/ГГГГ (например 25/12/2026).";
+
+/** Парсит ДД/ММ/ГГГГ или ДД.ММ.ГГГГ, возвращает Date (полночь UTC) или null */
+function parseDDMMYYYY(value: string): Date | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const match = trimmed.match(/^(\d{1,2})[./](\d{1,2})[./](\d{4})$/);
+  if (!match) return null;
+  const [, day, month, year] = match;
+  const d = parseInt(day, 10);
+  const m = parseInt(month, 10) - 1;
+  const y = parseInt(year, 10);
+  if (m < 0 || m > 11 || d < 1 || d > 31 || y < 2000 || y > 2100) return null;
+  const date = new Date(Date.UTC(y, m, d));
+  if (
+    date.getUTCDate() !== d ||
+    date.getUTCMonth() !== m ||
+    date.getUTCFullYear() !== y
+  )
+    return null;
+  return date;
+}
+
+function isDateBeforeToday(date: Date): boolean {
+  const now = new Date();
+  const startOfToday = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+  );
+  const day = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+  );
+  return day < startOfToday;
+}
+
+function toISODate(date: Date): string {
+  const y = date.getUTCFullYear();
+  const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(date.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 type Props = {
   projectId: string;
   members: Member[];
@@ -18,15 +62,27 @@ export function CreateTaskForm({ projectId, members }: Props) {
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
-    setLoading(true);
-
     const form = e.currentTarget;
     const title = (form.elements.namedItem("title") as HTMLInputElement).value.trim();
     const description = (form.elements.namedItem("description") as HTMLInputElement).value.trim();
     const assigneeId = (form.elements.namedItem("assigneeId") as HTMLSelectElement).value || null;
-    const deadlineRaw = (form.elements.namedItem("deadline") as HTMLInputElement).value;
-    const deadline = deadlineRaw ? new Date(deadlineRaw).toISOString() : null;
+    const deadlineRaw = (form.elements.namedItem("deadline") as HTMLInputElement).value.trim();
 
+    let deadline: string | null = null;
+    if (deadlineRaw) {
+      const parsed = parseDDMMYYYY(deadlineRaw);
+      if (!parsed) {
+        setError(DEADLINE_ERROR_FORMAT);
+        return;
+      }
+      if (isDateBeforeToday(parsed)) {
+        setError(DEADLINE_ERROR_PAST);
+        return;
+      }
+      deadline = toISODate(parsed);
+    }
+
+    setLoading(true);
     const res = await fetch(`/api/projects/${projectId}/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -99,7 +155,13 @@ export function CreateTaskForm({ projectId, members }: Props) {
           <label className="block text-sm font-medium text-[var(--asana-text-secondary)]">
             Дедлайн
           </label>
-          <input name="deadline" type="datetime-local" className="input-base" />
+          <input
+            name="deadline"
+            type="text"
+            className="input-base"
+            placeholder="ДД/ММ/ГГГГ"
+            autoComplete="off"
+          />
         </div>
         <div className="space-y-2">
           <label className="block text-sm font-medium text-[var(--asana-text-secondary)]">

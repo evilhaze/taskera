@@ -95,9 +95,20 @@ model Task {
   comments    Comment[]
   taskLabels  TaskLabel[]
   activities  Activity[]
+  subtasks    Subtask[]
 
   @@index([projectId, status])
   @@index([deadline])
+}
+
+model Subtask {
+  id          String   @id @default(cuid())
+  title       String
+  isCompleted Boolean  @default(false)
+  taskId      String
+  createdAt   DateTime @default(now())
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
 
 model Comment {
@@ -144,6 +155,9 @@ enum ActivityType {
   LABEL_REMOVED
   PROJECT_CREATED
   MEMBER_ADDED
+  SUBTASK_CREATED
+  SUBTASK_COMPLETED
+  SUBTASK_DELETED
 }
 
 model Activity {

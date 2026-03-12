@@ -31,6 +31,7 @@ export type KanbanTask = {
   createdAt: string;
   project?: { id: string; name: string };
   taskLabels?: { label: LabelShape }[];
+  subtasks?: { id: string; isCompleted: boolean }[];
 };
 
 const STATUS_ORDER: readonly string[] = [
@@ -70,6 +71,9 @@ function TaskCard({
 }) {
   const deadlineStr = formatDeadline(task.deadline);
   const labels = task.taskLabels?.map((tl) => tl.label) ?? [];
+  const subtasks = task.subtasks ?? [];
+  const completedCount = subtasks.filter((s) => s.isCompleted).length;
+  const hasSubtasks = subtasks.length > 0;
   return (
     <div
       className={
@@ -85,6 +89,19 @@ function TaskCard({
         </span>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium leading-snug text-[var(--asana-text-primary)]">{task.title}</p>
+          {hasSubtasks && (
+            <div className="mt-2 flex items-center gap-2">
+              <div className="h-1.5 flex-1 min-w-[60px] max-w-[100px] overflow-hidden rounded-full bg-[var(--asana-bg-input)]">
+                <div
+                  className="h-full rounded-full bg-[var(--asana-blue)]/70 transition-all duration-200"
+                  style={{ width: `${subtasks.length ? (completedCount / subtasks.length) * 100 : 0}%` }}
+                />
+              </div>
+              <span className="text-[10px] font-medium text-[var(--asana-text-placeholder)] tabular-nums">
+                {completedCount}/{subtasks.length}
+              </span>
+            </div>
+          )}
           {(labels.length > 0 || (showProjectInCard && task.project) || task.assignee || deadlineStr || task.priority) ? (
             <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-xs text-[var(--asana-text-secondary)]">
               {labels.length > 0 && (

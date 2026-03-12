@@ -22,6 +22,7 @@ export type ActivityMeta = {
   assigneeEmail?: string;
   memberEmail?: string;
   labelName?: string;
+  subtaskTitle?: string;
   [key: string]: unknown;
 };
 
@@ -108,6 +109,18 @@ export function formatActivityMessage(
       return meta?.memberEmail
         ? `${name} добавил участника ${meta.memberEmail} в проект`
         : `${name} добавил участника в проект`;
+    case "SUBTASK_CREATED":
+      return meta?.subtaskTitle
+        ? `${name} добавил подзадачу «${meta.subtaskTitle}»`
+        : `${name} добавил подзадачу`;
+    case "SUBTASK_COMPLETED":
+      return meta?.subtaskTitle
+        ? `${name} выполнил подзадачу «${meta.subtaskTitle}»`
+        : `${name} выполнил подзадачу`;
+    case "SUBTASK_DELETED":
+      return meta?.subtaskTitle
+        ? `${name} удалил подзадачу «${meta.subtaskTitle}»`
+        : `${name} удалил подзадачу`;
     default:
       return name;
   }
