@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Flowboard — Управление задачами и проектами",
+  title: "Tasken — Управление задачами и проектами",
   description: "Современная SaaS-платформа для управления задачами, проектами и командами. Kanban, аналитика, AI-помощник."
 };
 
