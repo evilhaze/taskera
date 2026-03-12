@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { setAuthCookie } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -32,8 +31,5 @@ export default async function DemoEntryPage() {
     );
   }
 
-  const { getOrCreateDemoUser } = await import("@/lib/demo-seed");
-  const user = await getOrCreateDemoUser();
-  await setAuthCookie(user.id);
-  redirect("/app/dashboard");
+  redirect("/api/demo/start");
 }
