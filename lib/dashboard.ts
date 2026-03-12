@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
 const STATUS_ORDER = ["TODO", "IN_PROGRESS", "REVIEW", "DONE"] as const;
@@ -59,6 +60,16 @@ export type DashboardAnalytics = {
 };
 
 export async function getDashboardAnalytics(
+  userId: string
+): Promise<DashboardAnalytics> {
+  return unstable_cache(
+    async () => getDashboardAnalyticsUncached(userId),
+    ["dashboard-analytics", userId],
+    { revalidate: 30 }
+  )();
+}
+
+async function getDashboardAnalyticsUncached(
   userId: string
 ): Promise<DashboardAnalytics> {
   const memberships = await prisma.projectMember.findMany({
