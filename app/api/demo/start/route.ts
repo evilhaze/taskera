@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getOrCreateDemoUser } from "@/lib/demo-seed";
-import { setAuthCookie } from "@/lib/auth";
+import { signAuthToken } from "@/lib/auth";
+
+const AUTH_COOKIE_NAME = "auth_token";
+const AUTH_COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +15,15 @@ export async function GET(req: NextRequest) {
   }
 
   const user = await getOrCreateDemoUser();
-  await setAuthCookie(user.id);
-  return NextResponse.redirect(new URL("/app/dashboard", req.url));
+  const token = signAuthToken({ userId: user.id });
+
+  const redirectUrl = new URL("/app/dashboard", req.url);
+  const res = NextResponse.redirect(redirectUrl);
+  res.cookies.set(AUTH_COOKIE_NAME, token, {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: AUTH_COOKIE_MAX_AGE
+  });
+  return res;
 }
