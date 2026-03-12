@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { addMemberSchema, removeMemberSchema } from "@/lib/validations/project";
 import { createActivity, formatActivityMessage } from "@/lib/activity";
+import { isDemoUser } from "@/lib/demo";
 
 export async function POST(
   req: NextRequest,
@@ -11,6 +12,18 @@ export async function POST(
   const user = await getCurrentUser();
   if (!user) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  if (isDemoUser(user)) {
+    return NextResponse.json(
+      {
+        message:
+          "Приглашение участников недоступно в демо-режиме. Зарегистрируйтесь или перейдите на тариф Plus.",
+        code: "DEMO_INVITE_BLOCKED",
+        upsell: true
+      },
+      { status: 403 }
+    );
   }
 
   const { projectId } = await params;

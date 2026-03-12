@@ -17,6 +17,7 @@ type Props = {
   ownerId: string;
   currentUserId: string;
   isOwner: boolean;
+  isDemo?: boolean;
 };
 
 export function MembersSection({
@@ -24,7 +25,8 @@ export function MembersSection({
   members,
   ownerId,
   currentUserId,
-  isOwner
+  isOwner,
+  isDemo = false
 }: Props) {
   const router = useRouter();
   const [removingId, setRemovingId] = useState<string | null>(null);
@@ -117,7 +119,18 @@ export function MembersSection({
 
       {isOwner && (
         <div className="mt-4">
-          <AddMemberForm projectId={projectId} onSuccess={onMemberAdded} />
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            {isDemo && (
+              <span className="rounded bg-amber-500/20 px-2 py-0.5 text-xs font-medium text-amber-600 dark:text-amber-400">
+                Недоступно в демо
+              </span>
+            )}
+          </div>
+          <AddMemberForm
+            projectId={projectId}
+            onSuccess={onMemberAdded}
+            isDemo={isDemo}
+          />
         </div>
       )}
     </section>

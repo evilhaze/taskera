@@ -1,6 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
+import { isDemoUser } from "@/lib/demo";
 import { prisma } from "@/lib/prisma";
 import { MembersSection } from "@/components/project/MembersSection";
 import { TasksSection } from "@/components/project/TasksSection";
@@ -39,6 +40,7 @@ export default async function ProjectPage({ params }: Props) {
 
   const project = membership.project;
   const isOwner = membership.role === "OWNER";
+  const isDemo = isDemoUser(user);
 
   const [total, byStatusRows, overdue] = await Promise.all([
     prisma.task.count({ where: { projectId } }),
@@ -90,6 +92,7 @@ export default async function ProjectPage({ params }: Props) {
           ownerId={project.ownerId}
           currentUserId={user.id}
           isOwner={isOwner}
+          isDemo={isDemo}
         />
 
         <ManageLabelsSection projectId={project.id} />

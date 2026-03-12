@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { aiImproveDescription } from "@/lib/ai/actions";
 import { isAIAvailable } from "@/lib/ai/client";
 import { mapAIErrorToResponse } from "@/lib/ai/errors";
+import { isDemoUser } from "@/lib/demo";
 
 async function ensureTaskAccess(userId: string, taskId: string) {
   const task = await prisma.task.findUnique({
@@ -21,6 +22,13 @@ export async function POST(req: NextRequest) {
   const user = await getCurrentUser();
   if (!user) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  if (isDemoUser(user)) {
+    return NextResponse.json(
+      { message: "AI Assistant доступен в подписке Taskera Plus.", code: "DEMO_AI_LOCKED", upsell: true },
+      { status: 403 }
+    );
   }
 
   if (!isAIAvailable()) {

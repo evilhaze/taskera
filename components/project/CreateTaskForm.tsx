@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { PriorityBadge } from "@/components/priority/PriorityBadge";
+import { openUpsellModal } from "@/components/demo/UpsellModal";
 
 type Member = { id: string; email: string; name: string | null };
 
@@ -99,6 +100,7 @@ export function CreateTaskForm({ projectId, members }: Props) {
     setLoading(false);
 
     if (!res.ok) {
+      if (res.status === 403 && data.upsell) openUpsellModal();
       setError(data.message ?? "Не удалось создать задачу");
       return;
     }

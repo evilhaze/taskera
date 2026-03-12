@@ -13,9 +13,10 @@ type Props = {
     avatarUrl?: string | null;
     avatarEmoji?: string | null;
   } | null;
+  isDemo?: boolean;
 };
 
-export function ProfileDropdown({ user }: Props) {
+export function ProfileDropdown({ user, isDemo }: Props) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -64,11 +65,26 @@ export function ProfileDropdown({ user }: Props) {
             <p className="truncate text-sm font-medium text-[var(--asana-text-primary)]">
               {user.name ?? user.email}
             </p>
-            <p className="truncate text-xs text-[var(--asana-text-placeholder)]">
+            <p className="flex items-center gap-2 truncate text-xs text-[var(--asana-text-placeholder)]">
               {user.email}
+              {isDemo && (
+                <span className="shrink-0 rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                  Демо
+                </span>
+              )}
             </p>
           </div>
           <div className="py-1">
+            {isDemo && (
+              <Link
+                href="/register"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-indigo-500 hover:bg-white/5 transition-colors"
+                role="menuitem"
+              >
+                Зарегистрироваться
+              </Link>
+            )}
             <Link
               href="/app/settings/profile"
               onClick={() => setOpen(false)}
@@ -85,7 +101,7 @@ export function ProfileDropdown({ user }: Props) {
                 role="menuitem"
               >
                 <LogOut className="h-4 w-4 shrink-0" aria-hidden />
-                Выйти
+                {isDemo ? "Выйти из демо" : "Выйти"}
               </button>
             </form>
           </div>

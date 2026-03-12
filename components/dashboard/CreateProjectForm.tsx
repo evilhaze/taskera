@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { openUpsellModal } from "@/components/demo/UpsellModal";
 
 export function CreateProjectForm() {
   const router = useRouter();
@@ -27,6 +28,9 @@ export function CreateProjectForm() {
     setLoading(false);
 
     if (!res.ok) {
+      if (res.status === 403 && data.upsell) {
+        openUpsellModal();
+      }
       setError(data.message ?? "Не удалось создать проект");
       return;
     }

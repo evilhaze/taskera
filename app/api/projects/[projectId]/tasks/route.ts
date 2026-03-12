@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createTaskSchema } from "@/lib/validations/task";
 import { createActivity, formatActivityMessage } from "@/lib/activity";
+import { isDemoUser, DEMO_LIMITS } from "@/lib/demo";
 
 async function ensureProjectAccess(userId: string, projectId: string) {
   const membership = await prisma.projectMember.findUnique({
@@ -80,6 +81,31 @@ export async function POST(
 
   const { title, description, assigneeId, deadline, priority, status } =
     parsed.data;
+
+  if (isDemoUser(user)) {
+    const memberships = await prisma.projectMember.findMany({
+      where: { userId: user.id },
+      select: { projectId: true }
+    });
+    const projectIds = memberships.map((m) => m.projectId);
+    const taskCount =
+      projectIds.length === 0
+        ? 0
+        : await prisma.task.count({
+            where: { projectId: { in: projectIds } }
+          });
+    if (taskCount >= DEMO_LIMITS.maxTasks) {
+      return NextResponse.json(
+        {
+          message:
+            "В демо-режиме можно создать не более 10 задач. Перейдите на Taskera Plus для полного доступа.",
+          code: "DEMO_LIMIT_TASKS",
+          upsell: true
+        },
+        { status: 403 }
+      );
+    }
+  }
 
   const deadlineDate =
     deadline && deadline !== "" ? new Date(deadline) : null;

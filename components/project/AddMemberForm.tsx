@@ -1,10 +1,11 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { openDemoInviteBlockedModal } from "@/components/demo/DemoInviteBlockedModal";
 
-type Props = { projectId: string; onSuccess?: () => void };
+type Props = { projectId: string; onSuccess?: () => void; isDemo?: boolean };
 
-export function AddMemberForm({ projectId, onSuccess }: Props) {
+export function AddMemberForm({ projectId, onSuccess, isDemo = false }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -13,6 +14,12 @@ export function AddMemberForm({ projectId, onSuccess }: Props) {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+
+    if (isDemo) {
+      openDemoInviteBlockedModal();
+      return;
+    }
+
     setLoading(true);
 
     const form = e.currentTarget;
@@ -28,6 +35,9 @@ export function AddMemberForm({ projectId, onSuccess }: Props) {
     setLoading(false);
 
     if (!res.ok) {
+      if (res.status === 403 && data.upsell) {
+        openDemoInviteBlockedModal();
+      }
       setError(data.message ?? "Не удалось добавить участника");
       return;
     }

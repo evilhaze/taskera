@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { openUpsellModal } from "@/components/demo/UpsellModal";
 
 type Props = {
   projectId: string;
@@ -29,7 +30,11 @@ export function InlineAddTask({ projectId, status, onCreated, onCancel }: Props)
       body: JSON.stringify({ title: t, status })
     });
     setLoading(false);
-    if (!res.ok) return;
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 403 && data.upsell) openUpsellModal();
+      return;
+    }
     setTitle("");
     onCreated();
   }

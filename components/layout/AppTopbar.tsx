@@ -7,9 +7,10 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 type Props = {
   user: { id: string; email: string; name: string | null; avatarUrl?: string | null; avatarEmoji?: string | null } | null;
   aiEnabled?: boolean;
+  isDemo?: boolean;
 };
 
-export function AppTopbar({ user, aiEnabled }: Props) {
+export function AppTopbar({ user, aiEnabled, isDemo }: Props) {
   return (
     <header className="sticky top-0 z-20 flex h-12 items-center justify-between border-b border-[var(--asana-border-subtle)] bg-[var(--asana-bg-app)] px-4">
       <div className="flex items-center gap-3">
@@ -38,9 +39,9 @@ export function AppTopbar({ user, aiEnabled }: Props) {
 
       <div className="flex items-center gap-1">
         <ThemeToggle />
-        <AIAssistantTrigger aiEnabled={aiEnabled} />
+        <AIAssistantTrigger aiEnabled={aiEnabled} isDemo={isDemo} />
         <NotificationDropdown />
-        <ProfileDropdown user={user} />
+        <ProfileDropdown user={user} isDemo={isDemo} />
       </div>
     </header>
   );

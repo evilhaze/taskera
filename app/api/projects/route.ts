@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { createProjectSchema } from "@/lib/validations/project";
 import { createActivity, formatActivityMessage } from "@/lib/activity";
+import { isDemoUser, DEMO_LIMITS } from "@/lib/demo";
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -90,6 +91,22 @@ export async function POST(req: NextRequest) {
   }
 
   const { name, description } = parsed.data;
+
+  if (isDemoUser(user)) {
+    const projectCount = await prisma.projectMember.count({
+      where: { userId: user.id }
+    });
+    if (projectCount >= DEMO_LIMITS.maxProjects) {
+      return NextResponse.json(
+        {
+          message: "В демо-режиме можно создать не более 3 проектов. Перейдите на Taskera Plus для полного доступа.",
+          code: "DEMO_LIMIT_PROJECTS",
+          upsell: true
+        },
+        { status: 403 }
+      );
+    }
+  }
 
   const project = await prisma.project.create({
     data: {
