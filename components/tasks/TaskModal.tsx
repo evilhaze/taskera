@@ -108,14 +108,34 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+
+  const hasUnsavedChanges =
+    !!task &&
+    (editedTitle.trim() !== task.title ||
+      editedDescription.trim() !== (task.description ?? "") ||
+      editedStatus !== (task.status ?? "TODO") ||
+      editedPriority !== (task.priority ?? "MEDIUM") ||
+      editedAssigneeId !== (task.assigneeId ?? "") ||
+      editedDeadline !== deadlineToInputValue(task.deadline));
+
+  const requestClose = useCallback(() => {
+    if (hasUnsavedChanges) {
+      setShowCloseConfirm(true);
+    } else {
+      onClose();
+    }
+  }, [hasUnsavedChanges, onClose]);
 
   useEffect(() => {
-    if (open) {
+    if (!open) {
+      setShowCloseConfirm(false);
       setMounted(false);
-      const id = requestAnimationFrame(() => setMounted(true));
-      return () => cancelAnimationFrame(id);
+      return;
     }
     setMounted(false);
+    const id = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(id);
   }, [open]);
 
   // Перенос фокуса в модалку при открытии, чтобы не оставаться в поле поиска шапки
@@ -195,7 +215,16 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
 
   useEffect(() => {
     function handleKeyDown(e: globalThis.KeyboardEvent) {
-      if (e.key === "Escape") onClose();
+      if (e.key !== "Escape") return;
+      if (showCloseConfirm) {
+        setShowCloseConfirm(false);
+        return;
+      }
+      if (hasUnsavedChanges) {
+        setShowCloseConfirm(true);
+        return;
+      }
+      onClose();
     }
     if (open) {
       document.addEventListener("keydown", handleKeyDown);
@@ -205,10 +234,10 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
         document.body.style.overflow = "";
       };
     }
-  }, [open, onClose]);
+  }, [open, onClose, hasUnsavedChanges, showCloseConfirm]);
 
-  function handleOverlayClick(e: React.MouseEvent) {
-    if (e.target === overlayRef.current) onClose();
+  function handleOverlayClick(_e: React.MouseEvent) {
+    // Не закрывать по клику вне модалки — только по кнопкам и Escape
   }
 
   async function handleSave(e: FormEvent) {
@@ -372,7 +401,7 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
           )}
           <button
             type="button"
-            onClick={onClose}
+            onClick={requestClose}
             className="shrink-0 rounded-md p-1.5 text-[var(--asana-text-secondary)] hover:bg-white/10 hover:text-[var(--asana-text-primary)] transition-colors"
             aria-label="Закрыть"
           >
@@ -644,8 +673,13 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
             {error && (
               <p className="mb-3 text-sm text-[var(--asana-red)]">{error}</p>
             )}
+            {hasUnsavedChanges && (
+              <p className="mb-2 text-xs text-[var(--asana-text-placeholder)]">
+                Есть несохранённые изменения
+              </p>
+            )}
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={onClose} className="btn-secondary">
+              <button type="button" onClick={requestClose} className="btn-secondary">
                 Отмена
               </button>
               <button
@@ -656,6 +690,44 @@ export function TaskModal({ taskId, open, onClose, onSaved }: Props) {
               >
                 {saving ? "Сохранение…" : "Сохранить"}
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Confirm close when dirty */}
+        {showCloseConfirm && (
+          <div
+            className="absolute inset-0 z-10 flex items-center justify-center rounded-xl bg-black/70 p-4"
+            role="alertdialog"
+            aria-labelledby="close-confirm-title"
+            aria-describedby="close-confirm-desc"
+          >
+            <div className="w-full max-w-sm rounded-xl border border-[var(--asana-border)] bg-[var(--asana-bg-card)] p-6 shadow-xl">
+              <h3 id="close-confirm-title" className="text-lg font-semibold text-[var(--asana-text-primary)]">
+                Закрыть без сохранения?
+              </h3>
+              <p id="close-confirm-desc" className="mt-2 text-sm text-[var(--asana-text-secondary)]">
+                У вас есть несохранённые изменения. Вы уверены, что хотите закрыть окно?
+              </p>
+              <div className="mt-6 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCloseConfirm(false)}
+                  className="btn-primary"
+                >
+                  Остаться
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCloseConfirm(false);
+                    onClose();
+                  }}
+                  className="btn-secondary"
+                >
+                  Закрыть без сохранения
+                </button>
+              </div>
             </div>
           </div>
         )}

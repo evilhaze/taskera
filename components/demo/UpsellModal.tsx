@@ -40,7 +40,10 @@ export function UpsellModal({ open, onClose }: Props) {
         onClick={onClose}
         aria-hidden
       />
-      <div className="relative w-full max-w-md rounded-2xl border border-[var(--asana-border)] bg-[var(--asana-bg-card)] shadow-xl">
+      <div
+        className="relative w-full max-w-md rounded-2xl border border-[var(--asana-border)] bg-[var(--asana-bg-card)] shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-start justify-between gap-4 p-6 pb-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-500">
             <Sparkles className="h-6 w-6" aria-hidden />
