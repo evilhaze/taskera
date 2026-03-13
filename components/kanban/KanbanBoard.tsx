@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   DndContext,
   DragEndEvent,
@@ -431,7 +431,24 @@ export function KanbanBoard({
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTaskId, setModalTaskId] = useState<string | null>(null);
   const [inlineAddStatus, setInlineAddStatus] = useState<string | null>(null);
+  const [pendingStatusUpdate, setPendingStatusUpdate] = useState<{ taskId: string; newStatus: string } | null>(null);
+  const [statusUpdateError, setStatusUpdateError] = useState<string | null>(null);
   const justDraggedRef = useRef(false);
+
+  const displayTasks = useMemo(() => {
+    if (!pendingStatusUpdate) return tasks;
+    return tasks.map((t) =>
+      t.id === pendingStatusUpdate.taskId
+        ? { ...t, status: pendingStatusUpdate.newStatus }
+        : t
+    );
+  }, [tasks, pendingStatusUpdate]);
+
+  useEffect(() => {
+    if (!statusUpdateError) return;
+    const t = setTimeout(() => setStatusUpdateError(null), 4000);
+    return () => clearTimeout(t);
+  }, [statusUpdateError]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -440,7 +457,7 @@ export function KanbanBoard({
   );
 
   const activeTask = activeId
-    ? tasks.find((t) => t.id === activeId) ?? null
+    ? displayTasks.find((t) => t.id === activeId) ?? null
     : null;
 
   function handleDragStart(e: DragStartEvent) {
@@ -448,7 +465,7 @@ export function KanbanBoard({
     setActiveId(e.active.id as string);
   }
 
-  async function handleDragEnd(e: DragEndEvent) {
+  function handleDragEnd(e: DragEndEvent) {
     setActiveId(null);
     justDraggedRef.current = true;
     setTimeout(() => {
@@ -462,16 +479,30 @@ export function KanbanBoard({
 
     if (!STATUS_ORDER.includes(newStatus)) return;
 
-    const task = tasks.find((t) => t.id === taskId);
+    const task = displayTasks.find((t) => t.id === taskId);
     if (!task || task.status === newStatus) return;
 
-    const res = await fetch(`/api/tasks/${taskId}`, {
+    setStatusUpdateError(null);
+    setPendingStatusUpdate({ taskId, newStatus });
+
+    fetch(`/api/tasks/${taskId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: newStatus })
-    });
-
-    if (res.ok) onTaskMoved();
+    })
+      .then((res) => {
+        if (res.ok) {
+          setPendingStatusUpdate(null);
+          onTaskMoved();
+        } else {
+          setPendingStatusUpdate(null);
+          setStatusUpdateError("Не удалось обновить статус задачи");
+        }
+      })
+      .catch(() => {
+        setPendingStatusUpdate(null);
+        setStatusUpdateError("Не удалось обновить статус задачи");
+      });
   }
 
   function handleTaskClick(taskId: string) {
@@ -500,7 +531,7 @@ export function KanbanBoard({
 
   const byStatus = STATUS_ORDER.reduce(
     (acc, status) => {
-      acc[status] = tasks.filter((t) => t.status === status);
+      acc[status] = displayTasks.filter((t) => t.status === status);
       return acc;
     },
     {} as Record<string, KanbanTask[]>
@@ -512,6 +543,14 @@ export function KanbanBoard({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
+      {statusUpdateError && (
+        <div
+          role="alert"
+          className="mb-3 rounded-lg border border-[var(--asana-red)]/50 bg-[var(--asana-red)]/10 px-4 py-2.5 text-sm text-[var(--asana-red)]"
+        >
+          {statusUpdateError}
+        </div>
+      )}
       <div className="flex flex-wrap gap-3">
         {STATUS_ORDER.map((status) => (
           <DroppableColumn

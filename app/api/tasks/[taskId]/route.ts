@@ -55,6 +55,8 @@ export async function GET(
   return NextResponse.json(task);
 }
 
+const STATUS_VALUES = ["TODO", "IN_PROGRESS", "REVIEW", "DONE"] as const;
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ taskId: string }> }
@@ -66,16 +68,60 @@ export async function PATCH(
 
   const { taskId } = await params;
 
-  const task = await ensureTaskAccess(user.id, taskId);
-  if (!task) {
-    return NextResponse.json({ message: "Task not found" }, { status: 404 });
-  }
-
   let body: unknown;
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ message: "Invalid JSON" }, { status: 400 });
+  }
+
+  const isStatusOnly =
+    typeof body === "object" &&
+    body !== null &&
+    Object.keys(body as object).length === 1 &&
+    "status" in (body as object) &&
+    STATUS_VALUES.includes((body as { status: string }).status);
+
+  if (isStatusOnly) {
+    const status = (body as { status: string }).status;
+    const task = await prisma.task.findUnique({
+      where: { id: taskId },
+      select: { id: true, projectId: true, title: true, status: true }
+    });
+    if (!task) {
+      return NextResponse.json({ message: "Task not found" }, { status: 404 });
+    }
+    const membership = await prisma.projectMember.findUnique({
+      where: {
+        userId_projectId: { userId: user.id, projectId: task.projectId }
+      }
+    });
+    if (!membership) {
+      return NextResponse.json({ message: "Task not found" }, { status: 404 });
+    }
+    await prisma.task.update({
+      where: { id: taskId },
+      data: { status: status as (typeof STATUS_VALUES)[number] }
+    });
+    const userName = user.name ?? user.email;
+    const message = formatActivityMessage("TASK_STATUS_CHANGED", userName, {
+      taskTitle: task.title,
+      newValue: status
+    });
+    await createActivity({
+      userId: user.id,
+      projectId: task.projectId,
+      type: "TASK_STATUS_CHANGED",
+      message,
+      taskId,
+      metadata: { taskTitle: task.title, oldValue: task.status, newValue: status }
+    });
+    return NextResponse.json({ ok: true, status });
+  }
+
+  const task = await ensureTaskAccess(user.id, taskId);
+  if (!task) {
+    return NextResponse.json({ message: "Task not found" }, { status: 404 });
   }
 
   const parsed = updateTaskSchema.safeParse(body);
